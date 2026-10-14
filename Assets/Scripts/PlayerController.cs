@@ -27,15 +27,36 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public void OnMove(InputValue value) { 
-        moveInput = value.Get<Vector2>(); }
-    public void OnLook(InputValue value) { lookInput = value.Get<Vector2>(); }
+    public void OnMove(InputValue value)
+    {
+        moveInput = value.Get<Vector2>();
+    }
+
+    public void OnLook(InputValue value)
+    {
+        lookInput = value.Get<Vector2>();
+    }
+
     public void OnJump(InputValue value)
     {
-        if (value.isPressed && controller.isGrounded) verticalVelocity = jumpPower;
+        if (value.isPressed && controller.isGrounded)
+        {
+            verticalVelocity = jumpPower;
+        }
     }
-    public void OnSprint(InputValue value) { isRunning = value.isPressed; }
-    public void OnAim(InputValue value) { if (value.isPressed) isAiming = !isAiming; }
+
+    public void OnSprint(InputValue value)
+    {
+        isRunning = value.isPressed;
+    }
+
+    public void OnAim(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            isAiming = !isAiming;
+        }
+    }
 
     void Update()
     {
