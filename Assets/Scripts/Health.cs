@@ -5,6 +5,7 @@ public class Health : MonoBehaviour
 {
     public int maxHp = 3;
     public int currentHp;
+    public int score = 10;
     public Slider hpSlider;
 
     void Start()
@@ -21,6 +22,12 @@ public class Health : MonoBehaviour
         if (currentHp <= 0) Die();
     }
 
+    public void ResetHp()
+    {
+        currentHp = maxHp;
+        UpdateBar();
+    }
+
     void UpdateBar()
     {
         if (hpSlider != null) hpSlider.value = (float)currentHp / maxHp;
@@ -28,7 +35,18 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-        if (CompareTag("Player")) Time.timeScale = 0f;
-        else Destroy(gameObject);
+        GameManager gm = null;
+        GameObject g = GameObject.FindWithTag("GameController");
+        if (g != null) gm = g.GetComponent<GameManager>();
+
+        if (CompareTag("Player"))
+        {
+            if (gm != null) gm.GameOver();
+        }
+        else
+        {
+            if (gm != null) gm.AddScore(score);
+            Destroy(gameObject);
+        }
     }
 }

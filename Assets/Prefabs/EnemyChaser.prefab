@@ -128,6 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHp: 3
   currentHp: 0
+  score: 10
   hpSlider: {fileID: 0}
 --- !u!114 &9136656574212312975
 MonoBehaviour:

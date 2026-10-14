@@ -9,6 +9,12 @@ public class EnemySpawner : MonoBehaviour
     public int maxAlive = 10;
 
     private float timer;
+    private float startInterval;
+
+    void Start()
+    {
+        startInterval = spawnInterval;
+    }
 
     void Update()
     {
@@ -23,5 +29,11 @@ public class EnemySpawner : MonoBehaviour
         int s = Random.Range(0, spawnPoints.Length);
         Instantiate(enemyPrefabs[e], spawnPoints[s].position, Quaternion.identity);
         spawnInterval = Mathf.Max(minInterval, spawnInterval - 0.1f);
+    }
+
+    public void ResetSpawner()
+    {
+        spawnInterval = startInterval;
+        timer = 0f;
     }
 }

@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void OnMove(InputValue value)
@@ -60,6 +59,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0f) return;
+
         transform.Rotate(0f, lookInput.x * mouseSensitivity, 0f);
         pitch = pitch - lookInput.y * mouseSensitivity;
         pitch = Mathf.Clamp(pitch, -20f, 60f);
