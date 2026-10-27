@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,23 +9,46 @@ public class Health : MonoBehaviour
     public int score = 10;
     public Slider hpSlider;
 
+    public float invincibilityDuration = 1.5f; 
+    public float blinkInterval = 0.1f;        
+    private bool isInvincible = false;       
+    private Renderer[] renderers;            
+
     void Start()
     {
         currentHp = maxHp;
         UpdateBar();
+
+        renderers = GetComponentsInChildren<Renderer>();
     }
 
     public void TakeDamage(int damage)
     {
-        if (currentHp <= 0) return;
+        if (currentHp <= 0 || isInvincible) return;
+
         currentHp -= damage;
         UpdateBar();
-        if (currentHp <= 0) Die();
+
+        if (currentHp <= 0)
+        {
+            Die();
+        }
+        else if (CompareTag("Player"))
+        {
+            StartCoroutine(InvincibilityCoroutine());
+        }
     }
 
     public void ResetHp()
     {
         currentHp = maxHp;
+        isInvincible = false; 
+
+        if (renderers != null)
+        {
+            foreach (Renderer r in renderers) r.enabled = true;
+        }
+
         UpdateBar();
     }
 
@@ -48,5 +72,27 @@ public class Health : MonoBehaviour
             if (gm != null) gm.AddScore(score);
             Destroy(gameObject);
         }
+    }
+    IEnumerator InvincibilityCoroutine()
+    {
+        isInvincible = true;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < invincibilityDuration)
+        {
+            foreach (Renderer r in renderers)
+            {
+                r.enabled = !r.enabled;
+            }
+
+            yield return new WaitForSeconds(blinkInterval);
+            elapsedTime += blinkInterval;
+        }
+
+        foreach (Renderer r in renderers)
+        {
+            r.enabled = true;
+        }
+        isInvincible = false;
     }
 }

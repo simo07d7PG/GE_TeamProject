@@ -71,10 +71,22 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = transform.forward * moveInput.y + transform.right * moveInput.x;
         float speed = moveSpeed;
-        float targetX = 0f;
-        float targetZ = -3f;
-        if (isRunning) { speed = moveSpeed * 2f; targetZ = -5f; }
-        if (isAiming) { targetX = 0.6f; targetZ = -1.5f; }
+
+        float targetX = 1.2f;  
+        float targetZ = -2.5f; 
+
+        if (isRunning)
+        {
+            speed = moveSpeed * 2f;
+            targetX = 1.2f;   
+            targetZ = -4.0f; 
+        }
+        if (isAiming)
+        {
+            targetX = 0.6f;   
+            targetZ = -1.2f; 
+        }
+
         move = move * speed;
         move.y = verticalVelocity;
 
