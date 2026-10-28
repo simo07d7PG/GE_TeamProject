@@ -5,6 +5,8 @@ public static class Fx
 {
     private static Material flashMaterial;
     private static Material particleMaterial;
+    private static AudioClip fanClipLow;
+    private static AudioClip fanClipHigh;
     private static readonly Dictionary<int, AudioClip> clips = new Dictionary<int, AudioClip>();
 
     public static Material FlashMaterial
@@ -98,6 +100,90 @@ public static class Fx
             clips[key] = clip;
         }
         AudioSource.PlayClipAtPoint(clip, position, volume);
+    }
+
+    public static AudioClip FanClipLow()
+    {
+        if (fanClipLow == null) fanClipLow = CreateFanClip("fan_low", 1800f, 213f, 0.14f, 0f, 0f, 1);
+        return fanClipLow;
+    }
+
+    public static AudioClip FanClipHigh()
+    {
+        if (fanClipHigh == null) fanClipHigh = CreateFanClip("fan_high", 5500f, 247f, 0.2f, 0.12f, 3100f, 2);
+        return fanClipHigh;
+    }
+
+    private static AudioClip CreateFanClip(string clipName, float lowPassHz, float bladeHz, float noiseRms, float air, float whineHz, int seed)
+    {
+        const int sampleRate = 44100;
+        const float duration = 3f;
+        int sampleCount = Mathf.CeilToInt(sampleRate * duration);
+        int fadeCount = sampleRate / 2;
+        float[] raw = new float[sampleCount + fadeCount];
+
+        System.Random random = new System.Random(seed);
+        float highK = 1f / (1f + 2f * Mathf.PI * 200f / sampleRate);
+        float lowK = 1f - Mathf.Exp(-2f * Mathf.PI * lowPassHz / sampleRate);
+        float prevWhite = 0f;
+        float prevIn1 = 0f;
+        float high1 = 0f;
+        float prevIn2 = 0f;
+        float high2 = 0f;
+        float low = 0f;
+        float sumSquares = 0f;
+        for (int i = 0; i < raw.Length; i++)
+        {
+            float white = (float)(random.NextDouble() * 2.0 - 1.0);
+            float colored = white + (white - prevWhite) * air;
+            prevWhite = white;
+
+            high1 = highK * (high1 + colored - prevIn1);
+            prevIn1 = colored;
+            high2 = highK * (high2 + high1 - prevIn2);
+            prevIn2 = high1;
+
+            low += lowK * (high2 - low);
+            raw[i] = low;
+            sumSquares += low * low;
+        }
+
+        float gain = noiseRms / Mathf.Sqrt(sumSquares / raw.Length);
+        float driftA = (float)random.NextDouble() * Mathf.PI * 2f;
+        float driftB = (float)random.NextDouble() * Mathf.PI * 2f;
+
+        float[] data = new float[sampleCount];
+        float peak = 0f;
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float noise = raw[i];
+            if (i < fadeCount)
+            {
+                float w = (float)i / fadeCount * Mathf.PI * 0.5f;
+                noise = raw[i] * Mathf.Sin(w) + raw[sampleCount + i] * Mathf.Cos(w);
+            }
+
+            float cycle = 2f * Mathf.PI * i / sampleCount;
+            float drift = 1f + 0.02f * (Mathf.Sin(cycle + driftA) + 0.6f * Mathf.Sin(cycle * 2f + driftB));
+
+            double t = (double)i / sampleRate;
+            float blade = (float)System.Math.Sin(2.0 * System.Math.PI * bladeHz * t) * 0.03f
+                + (float)System.Math.Sin(2.0 * System.Math.PI * bladeHz * 2.0 * t) * 0.012f;
+            float whine = whineHz > 0f ? (float)System.Math.Sin(2.0 * System.Math.PI * whineHz * t) * 0.004f : 0f;
+
+            data[i] = noise * gain * drift + blade + whine;
+            peak = Mathf.Max(peak, Mathf.Abs(data[i]));
+        }
+
+        if (peak > 0.75f)
+        {
+            float scale = 0.75f / peak;
+            for (int i = 0; i < sampleCount; i++) data[i] *= scale;
+        }
+
+        AudioClip clip = AudioClip.Create(clipName, sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
     }
 
     private static AudioClip CreateClip(float frequency, float duration)

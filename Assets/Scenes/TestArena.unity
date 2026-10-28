@@ -2412,8 +2412,58 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeatGauge
   heatSlider: {fileID: 1651282027}
   gameManager: {fileID: 698031244}
-  heatPerEnemy: 0.3
-  coolPerSecond: 2
+  maxHeat: 100
+  enemyThreshold: 5
+  heatRiseCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0.75
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 4
+      inSlope: 0.75
+      outSlope: 1.2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 10
+      value: 10
+      inSlope: 1.2
+      outSlope: 1.2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  maxRisePerSecond: 12
+  coolPerSecond: 1
+  riseMultiplier: 1
+  coolMultiplier: 1
+  fanMinVolume: 0.05
+  fanMaxVolume: 0.6
+  fanMinPitch: 0.97
+  fanMaxPitch: 1.08
 --- !u!4 &1114166925
 Transform:
   m_ObjectHideFlags: 0
@@ -3394,6 +3444,7 @@ MonoBehaviour:
   coolPerSecond: 20
   killCool: 10
   overheatUnlock: 40
+  overheatSystemHeat: 10
 --- !u!114 &1593626520
 MonoBehaviour:
   m_ObjectHideFlags: 0

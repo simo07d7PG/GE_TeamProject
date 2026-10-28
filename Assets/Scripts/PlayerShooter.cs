@@ -12,11 +12,15 @@ public class PlayerShooter : MonoBehaviour
     public float coolPerSecond = 20f;
     public float killCool = 10f;
     public float overheatUnlock = 40f;
+    public float overheatSystemHeat = 10f;
 
     private float lastFireTime = -999f;
     private Camera mainCam;
     private float weaponHeat;
     private bool overheated;
+
+    public float GunHeatRatio => Mathf.Clamp01(weaponHeat / 100f);
+    public bool Overheated => overheated;
 
     void Start()
     {
@@ -79,6 +83,7 @@ public class PlayerShooter : MonoBehaviour
             weaponHeat = 100f;
             overheated = true;
             Fx.Blip(transform.position, 180f, 0.25f, 0.6f);
+            if (GameManager.Instance != null && GameManager.Instance.heatGauge != null) GameManager.Instance.heatGauge.AddHeat(overheatSystemHeat);
         }
 
         Ray ray = mainCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));

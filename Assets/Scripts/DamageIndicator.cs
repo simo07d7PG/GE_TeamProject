@@ -11,6 +11,8 @@ public class DamageIndicator : MonoBehaviour
     public float flashTime = 0.4f;
     public float flashAlpha = 0.55f;
     public float heartbeatRate = 1.2f;
+    public float heatDangerStart = 0.6f;
+    public float heatDangerAlpha = 0.6f;
 
     private readonly List<Vector3> hitDirections = new List<Vector3>();
     private readonly List<float> hitTimes = new List<float>();
@@ -27,6 +29,11 @@ public class DamageIndicator : MonoBehaviour
         {
             float alpha = flashAlpha * Mathf.Clamp01(flashTimer / flashTime);
             if (LowHp) alpha = Mathf.Max(alpha, 0.2f + 0.35f * Heartbeat());
+            if (GameManager.Instance != null && GameManager.Instance.heatGauge != null)
+            {
+                float heatRatio = GameManager.Instance.heatGauge.HeatRatio;
+                alpha = Mathf.Max(alpha, heatDangerAlpha * Mathf.InverseLerp(heatDangerStart, 1f, heatRatio));
+            }
             return alpha;
         }
     }
