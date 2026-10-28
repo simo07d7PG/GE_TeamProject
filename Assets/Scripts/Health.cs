@@ -10,6 +10,7 @@ public class Health : MonoBehaviour
     public Slider hpSlider;
 
     public static event System.Action<Health> OnEnemyKilled;
+    public static event System.Action<Health, Vector3> OnPlayerDamaged;
 
     public float invincibilityDuration = 1.5f; 
     public float blinkInterval = 0.1f;        
@@ -47,7 +48,8 @@ public class Health : MonoBehaviour
         UpdateBar();
 
         bool isPlayer = CompareTag("Player");
-        if (!isPlayer) PlayHitFeedback(hitDirection);
+        if (isPlayer) OnPlayerDamaged?.Invoke(this, hitDirection);
+        else PlayHitFeedback(hitDirection);
 
         if (currentHp <= 0)
         {

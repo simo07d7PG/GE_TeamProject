@@ -33,7 +33,7 @@ public class EnemyChaser : MonoBehaviour
         else if (Time.time >= lastAttackTime + attackCooldown)
         {
             lastAttackTime = Time.time;
-            player.GetComponent<Health>().TakeDamage(damage);
+            player.GetComponent<Health>().TakeDamage(damage, transform.forward);
         }
     }
 }
