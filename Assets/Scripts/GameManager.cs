@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
     public GameObject titlePanel;
     public GameObject resultPanel;
     public Text scoreText;
@@ -18,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        Instance = this;
         titlePanel.SetActive(true);
         resultPanel.SetActive(false);
         Time.timeScale = 0f;

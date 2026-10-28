@@ -131,9 +131,7 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-        GameManager gm = null;
-        GameObject g = GameObject.FindWithTag("GameController");
-        if (g != null) gm = g.GetComponent<GameManager>();
+        GameManager gm = GameManager.Instance;
 
         if (CompareTag("Player"))
         {
