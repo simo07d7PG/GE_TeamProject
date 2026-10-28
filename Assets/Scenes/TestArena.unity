@@ -596,6 +596,11 @@ MonoBehaviour:
   currentHp: 0
   score: 10
   hpSlider: {fileID: 0}
+  invincibilityDuration: 1.5
+  blinkInterval: 0.1
+  knockbackForce: 4
+  knockbackDecay: 12
+  flashDuration: 0.06
 --- !u!23 &297687897
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -763,6 +768,11 @@ MonoBehaviour:
   currentHp: 0
   score: 10
   hpSlider: {fileID: 0}
+  invincibilityDuration: 1.5
+  blinkInterval: 0.1
+  knockbackForce: 4
+  knockbackDecay: 12
+  flashDuration: 0.06
 --- !u!23 &308124085
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1059,6 +1069,7 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: 8713327012530176196, guid: 732eea0c36a2a91489765a14cf7e9ce4, type: 3}
   - {fileID: 8530940423303685907, guid: 9b80b348ff3b7a440894f767fb3c2322, type: 3}
+  - {fileID: 8713327012530176196, guid: 41775e26325375643ab2875bfe7d38ad, type: 3}
   spawnPoints:
   - {fileID: 528010716}
   - {fileID: 550260030}
@@ -2911,6 +2922,10 @@ MonoBehaviour:
   firePoint: {fileID: 1615927210}
   bulletSpeed: 20
   fireCooldown: 0.2
+  heatPerShot: 8
+  coolPerSecond: 20
+  killCool: 10
+  overheatUnlock: 40
 --- !u!114 &1593626520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2927,6 +2942,11 @@ MonoBehaviour:
   currentHp: 0
   score: 10
   hpSlider: {fileID: 491038148}
+  invincibilityDuration: 1.5
+  blinkInterval: 0.1
+  knockbackForce: 4
+  knockbackDecay: 12
+  flashDuration: 0.06
 --- !u!114 &1601166415
 MonoBehaviour:
   m_ObjectHideFlags: 0
