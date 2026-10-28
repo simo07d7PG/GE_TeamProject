@@ -79,7 +79,8 @@ public class PlayerShooter : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
         if (overheated) return;
-        if (Time.time < lastFireTime + fireCooldown) return;
+        float cooldown = PlayerUpgrades.RapidFire ? fireCooldown * 0.5f : fireCooldown;
+        if (Time.time < lastFireTime + cooldown) return;
         lastFireTime = Time.time;
 
         weaponHeat += heatPerShot;
@@ -104,7 +105,13 @@ public class PlayerShooter : MonoBehaviour
 
         Vector3 fireDirection = (targetPoint - firePoint.position).normalized;
 
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(fireDirection));
-        bullet.GetComponent<Rigidbody>().linearVelocity = fireDirection * bulletSpeed;
+        float[] angles = PlayerUpgrades.TripleShot ? new[] { 0f, -12f, 12f } : new[] { 0f };
+        foreach (float angle in angles)
+        {
+            Vector3 dir = Quaternion.AngleAxis(angle, Vector3.up) * fireDirection;
+            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(dir));
+            bullet.GetComponent<Rigidbody>().linearVelocity = dir * bulletSpeed;
+            bullet.GetComponent<Bullet>().pierce = PlayerUpgrades.Pierce;
+        }
     }
 }

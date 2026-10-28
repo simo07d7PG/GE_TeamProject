@@ -73,6 +73,8 @@ public class GameManager : MonoBehaviour
         PlayerShooter shooter = player.GetComponentInChildren<PlayerShooter>();
         if (shooter != null) shooter.ResetWeaponHeat();
         if (ComboSystem.Instance != null) ComboSystem.Instance.ResetCombo();
+        if (PlayerUpgrades.Instance != null) PlayerUpgrades.Instance.ResetUpgrades();
+        foreach (Pickup p in FindObjectsByType<Pickup>(FindObjectsSortMode.None)) Destroy(p.gameObject);
 
         heatGauge.ResetHeat();
         foreach (EnemySpawner s in spawners) s.ResetSpawner();

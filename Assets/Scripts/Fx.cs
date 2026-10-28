@@ -41,6 +41,15 @@ public static class Fx
         }
     }
 
+    public static Material MakeMaterial(Color color)
+    {
+        Material baseMat = FlashMaterial;
+        Material mat = baseMat != null ? new Material(baseMat) : new Material(Shader.Find("Sprites/Default"));
+        mat.color = color;
+        if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
+        return mat;
+    }
+
     public static void Burst(Vector3 position, Color color, int count = 14)
     {
         GameObject go = new GameObject("FxBurst");

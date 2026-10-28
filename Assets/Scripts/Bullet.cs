@@ -6,6 +6,7 @@ public class Bullet : MonoBehaviour
     public float lifeTime = 2f;
     public string targetTag = "Enemy";
     public string ownerTag = "Player";
+    public bool pierce;
 
     void Start()
     {
@@ -21,6 +22,7 @@ public class Bullet : MonoBehaviour
         {
             Health hp = other.GetComponent<Health>();
             if (hp != null) hp.TakeDamage(damage, transform.forward);
+            if (pierce) return;
         }
         Destroy(gameObject);
     }

@@ -95,6 +95,14 @@ public class Health : MonoBehaviour
         isFlashing = false;
     }
 
+    public void Heal(int amount)
+    {
+        if (currentHp <= 0) return;
+
+        currentHp = Mathf.Min(maxHp, currentHp + amount);
+        UpdateBar();
+    }
+
     public void ResetHp()
     {
         currentHp = maxHp;
