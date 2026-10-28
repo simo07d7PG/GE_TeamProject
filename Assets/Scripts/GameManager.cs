@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
     public void AddScore(int amount)
     {
         if (!isPlaying) return;
-        score += amount;
+        score += amount * ComboSystem.Multiplier;
         UpdateScoreText();
     }
 
@@ -70,6 +70,7 @@ public class GameManager : MonoBehaviour
         player.GetComponent<Health>().ResetHp();
         PlayerShooter shooter = player.GetComponentInChildren<PlayerShooter>();
         if (shooter != null) shooter.ResetWeaponHeat();
+        if (ComboSystem.Instance != null) ComboSystem.Instance.ResetCombo();
 
         heatGauge.ResetHeat();
         foreach (EnemySpawner s in spawners) s.ResetSpawner();
