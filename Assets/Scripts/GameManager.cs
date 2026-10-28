@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
         isPlaying = true;
+        if (WaveManager.Instance != null) WaveManager.Instance.Begin();
     }
 
     public void AddScore(int amount)
@@ -52,6 +53,7 @@ public class GameManager : MonoBehaviour
     {
         if (!isPlaying) return;
         isPlaying = false;
+        if (WaveManager.Instance != null) WaveManager.Instance.End();
         resultScoreText.text = "SCORE " + score;
         resultPanel.SetActive(true);
         Time.timeScale = 0f;

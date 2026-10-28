@@ -19,6 +19,7 @@ public class EnemySpawner : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
+        if (WaveManager.SpawnPaused) return;
         if (timer < spawnInterval) return;
         timer = 0f;
 
