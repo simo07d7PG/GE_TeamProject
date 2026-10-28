@@ -20,7 +20,7 @@ public class Bullet : MonoBehaviour
         if (other.CompareTag(targetTag))
         {
             Health hp = other.GetComponent<Health>();
-            if (hp != null) hp.TakeDamage(damage);
+            if (hp != null) hp.TakeDamage(damage, transform.forward);
         }
         Destroy(gameObject);
     }
