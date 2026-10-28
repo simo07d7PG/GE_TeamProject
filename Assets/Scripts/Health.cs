@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,6 +21,9 @@ public class Health : MonoBehaviour
     public float flashDuration = 0.06f;
     private Vector3 knockback;
     private bool isFlashing;
+    private Vector3 flashBaseScale;
+    private Material[][] flashOriginals;
+    private float blinkElapsed;
     private float extraInvincibleUntil;
 
     void Start()
@@ -57,7 +59,7 @@ public class Health : MonoBehaviour
         }
         else if (isPlayer)
         {
-            StartCoroutine(InvincibilityCoroutine());
+            StartInvincibility();
         }
     }
 
@@ -67,34 +69,37 @@ public class Health : MonoBehaviour
         if (hitDirection.sqrMagnitude > 0.001f) knockback = hitDirection.normalized * knockbackForce;
 
         Fx.Blip(transform.position, 520f, 0.06f, 0.4f);
-        if (!isFlashing && currentHp > 0) StartCoroutine(HitFlashCoroutine());
+        if (!isFlashing && currentHp > 0) StartHitFlash();
     }
 
-    IEnumerator HitFlashCoroutine()
+    void StartHitFlash()
     {
         Material flash = Fx.FlashMaterial;
-        if (flash == null || renderers == null) yield break;
+        if (flash == null || renderers == null) return;
 
         isFlashing = true;
-        Vector3 baseScale = transform.localScale;
-        transform.localScale = baseScale * 1.15f;
+        flashBaseScale = transform.localScale;
+        transform.localScale = flashBaseScale * 1.15f;
 
-        Material[][] originals = new Material[renderers.Length][];
+        flashOriginals = new Material[renderers.Length][];
         for (int i = 0; i < renderers.Length; i++)
         {
-            originals[i] = renderers[i].sharedMaterials;
-            Material[] flashes = new Material[originals[i].Length];
+            flashOriginals[i] = renderers[i].sharedMaterials;
+            Material[] flashes = new Material[flashOriginals[i].Length];
             for (int m = 0; m < flashes.Length; m++) flashes[m] = flash;
             renderers[i].sharedMaterials = flashes;
         }
 
-        yield return new WaitForSeconds(flashDuration);
+        Invoke(nameof(EndHitFlash), flashDuration);
+    }
 
+    void EndHitFlash()
+    {
         for (int i = 0; i < renderers.Length; i++)
         {
-            if (renderers[i] != null) renderers[i].sharedMaterials = originals[i];
+            if (renderers[i] != null) renderers[i].sharedMaterials = flashOriginals[i];
         }
-        transform.localScale = baseScale;
+        transform.localScale = flashBaseScale;
         isFlashing = false;
     }
 
@@ -114,7 +119,8 @@ public class Health : MonoBehaviour
     public void ResetHp()
     {
         currentHp = maxHp;
-        isInvincible = false; 
+        isInvincible = false;
+        CancelInvoke(nameof(Blink));
 
         if (renderers != null)
         {
@@ -146,26 +152,31 @@ public class Health : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    IEnumerator InvincibilityCoroutine()
+
+    void StartInvincibility()
     {
         isInvincible = true;
-        float elapsedTime = 0f;
+        blinkElapsed = 0f;
+        Blink();
+    }
 
-        while (elapsedTime < invincibilityDuration)
+    void Blink()
+    {
+        if (blinkElapsed >= invincibilityDuration)
         {
             foreach (Renderer r in renderers)
             {
-                r.enabled = !r.enabled;
+                r.enabled = true;
             }
-
-            yield return new WaitForSeconds(blinkInterval);
-            elapsedTime += blinkInterval;
+            isInvincible = false;
+            return;
         }
 
         foreach (Renderer r in renderers)
         {
-            r.enabled = true;
+            r.enabled = !r.enabled;
         }
-        isInvincible = false;
+        blinkElapsed += blinkInterval;
+        Invoke(nameof(Blink), blinkInterval);
     }
 }
