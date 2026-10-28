@@ -21,6 +21,7 @@ public class Health : MonoBehaviour
     public float flashDuration = 0.06f;
     private Vector3 knockback;
     private bool isFlashing;
+    private float extraInvincibleUntil;
 
     void Start()
     {
@@ -40,7 +41,7 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(int damage, Vector3 hitDirection = default)
     {
-        if (currentHp <= 0 || isInvincible) return;
+        if (currentHp <= 0 || isInvincible || Time.time < extraInvincibleUntil) return;
 
         currentHp -= damage;
         UpdateBar();
@@ -93,6 +94,11 @@ public class Health : MonoBehaviour
         }
         transform.localScale = baseScale;
         isFlashing = false;
+    }
+
+    public void GrantInvincibility(float duration)
+    {
+        extraInvincibleUntil = Mathf.Max(extraInvincibleUntil, Time.time + duration);
     }
 
     public void Heal(int amount)

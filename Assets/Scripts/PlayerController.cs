@@ -13,6 +13,15 @@ public class PlayerController : MonoBehaviour
     public Transform cameraPivot;
     public Transform cameraTransform;
 
+    // 대시
+    public float dashSpeed = 18f;
+    public float dashDuration = 0.18f;
+    public float dashCooldown = 1.5f;
+
+    private float dashTimeLeft;
+    private float nextDashTime;
+    private Vector3 dashDirection;
+
     private Vector2 moveInput;
     private Vector2 lookInput;
     private bool isRunning;
@@ -47,6 +56,38 @@ public class PlayerController : MonoBehaviour
     public void OnSprint(InputValue value)
     {
         isRunning = value.isPressed;
+    }
+
+    // Crouch 액션(C 키)을 대시로 사용
+    public void OnCrouch(InputValue value)
+    {
+        if (!value.isPressed || Time.timeScale == 0f) return;
+        if (Time.time < nextDashTime) return;
+
+        Vector3 dir = transform.forward * moveInput.y + transform.right * moveInput.x;
+        dashDirection = dir.sqrMagnitude > 0.01f ? dir.normalized : transform.forward;
+        dashTimeLeft = dashDuration;
+        nextDashTime = Time.time + dashCooldown;
+
+        Health hp = GetComponent<Health>();
+        if (hp != null) hp.GrantInvincibility(dashDuration + 0.1f);
+        Fx.Burst(transform.position + Vector3.up * 0.5f, new Color(0.6f, 0.9f, 1f), 8);
+        Fx.Blip(transform.position, 700f, 0.1f, 0.4f);
+    }
+
+    void OnGUI()
+    {
+        if (Time.timeScale == 0f) return;
+
+        float width = 220f;
+        Rect back = new Rect((Screen.width - width) * 0.5f, Screen.height - 36f, width, 8f);
+        float ready = Mathf.Clamp01(1f - (nextDashTime - Time.time) / dashCooldown);
+
+        GUI.color = new Color(0f, 0f, 0f, 0.6f);
+        GUI.DrawTexture(back, Texture2D.whiteTexture);
+        GUI.color = ready >= 1f ? Color.green : Color.gray;
+        GUI.DrawTexture(new Rect(back.x + 1f, back.y + 1f, (width - 2f) * ready, back.height - 2f), Texture2D.whiteTexture);
+        GUI.color = Color.white;
     }
 
     public void OnAim(InputValue value)
@@ -87,7 +128,15 @@ public class PlayerController : MonoBehaviour
             targetZ = -1.2f; 
         }
 
-        move = move * speed;
+        if (dashTimeLeft > 0f)
+        {
+            dashTimeLeft -= Time.deltaTime;
+            move = dashDirection * dashSpeed;
+        }
+        else
+        {
+            move = move * speed;
+        }
         move.y = verticalVelocity;
 
         Vector3 camPos = cameraTransform.localPosition;
