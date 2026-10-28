@@ -14,6 +14,8 @@ public class EnemyBoss : MonoBehaviour
 
     private Transform player;
     private Health health;
+    private CharacterController controller;
+    private EnemyMove mover;
     private float lastFireTime;
     private float ringOffset;
 
@@ -32,6 +34,8 @@ public class EnemyBoss : MonoBehaviour
         GameObject p = GameObject.FindWithTag("Player");
         if (p != null) player = p.transform;
         health = GetComponent<Health>();
+        controller = GetComponent<CharacterController>();
+        mover = GetComponent<EnemyMove>();
         lastFireTime = Time.time;
     }
 
@@ -44,10 +48,8 @@ public class EnemyBoss : MonoBehaviour
         float distance = toPlayer.magnitude;
         if (distance > 0.01f) transform.forward = toPlayer.normalized;
 
-        if (distance > keepDistance)
-        {
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
-        }
+        Vector3 move = distance > keepDistance ? transform.forward : Vector3.zero;
+        mover.Fly(move, moveSpeed);
 
         if (Time.time >= lastFireTime + fireInterval)
         {
@@ -60,12 +62,14 @@ public class EnemyBoss : MonoBehaviour
     {
         if (bulletPrefab == null) return;
 
+        Vector3 origin = transform.position + controller.center;
+        float tilt = (player.position.y + 1f - origin.y) / keepDistance;
         ringOffset += 180f / ringBullets;
         for (int i = 0; i < ringBullets; i++)
         {
             float angle = ringOffset + 360f / ringBullets * i;
-            Vector3 dir = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
-            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.LookRotation(dir));
+            Vector3 dir = (Quaternion.Euler(0f, angle, 0f) * Vector3.forward + Vector3.up * tilt).normalized;
+            GameObject bullet = Instantiate(bulletPrefab, origin, Quaternion.LookRotation(dir));
             bullet.GetComponent<Rigidbody>().linearVelocity = dir * bulletSpeed;
         }
         Fx.Blip(transform.position, 140f, 0.3f, 0.7f);

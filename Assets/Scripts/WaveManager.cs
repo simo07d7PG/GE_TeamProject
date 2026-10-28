@@ -10,6 +10,7 @@ public class WaveManager : MonoBehaviour
     public float restDuration = 5f;
     public int bossEvery = 3;
     public int maxAliveStep = 2;
+    public Vector3 bossSpawn = new Vector3(20f, 2f, -10f);
 
     private bool active;
     private bool resting;
@@ -91,13 +92,7 @@ public class WaveManager : MonoBehaviour
     {
         if (bossPrefab == null) return;
 
-        foreach (EnemySpawner sp in FindObjectsByType<EnemySpawner>(FindObjectsSortMode.None))
-        {
-            if (sp.spawnPoints == null || sp.spawnPoints.Length == 0) continue;
-            Transform point = sp.spawnPoints[Random.Range(0, sp.spawnPoints.Length)];
-            Instantiate(bossPrefab, point.position, Quaternion.identity);
-            return;
-        }
+        Instantiate(bossPrefab, bossSpawn, Quaternion.identity);
     }
 
     void ShowBanner(string text, float seconds)
