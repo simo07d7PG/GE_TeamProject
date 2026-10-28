@@ -25,8 +25,7 @@ public class AdPopups : MonoBehaviour
     private readonly List<Popup> popups = new List<Popup>();
     private GUIStyle bodyStyle;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Create()
+    public static void Create()
     {
         if (Instance != null) return;
         new GameObject("AdPopups").AddComponent<AdPopups>();

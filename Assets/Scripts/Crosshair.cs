@@ -23,8 +23,7 @@ public class Crosshair : MonoBehaviour
     public bool MarkerVisible => markerTimer > 0f;
     public bool MarkerKill => markerKill;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Create()
+    public static void Create()
     {
         if (Instance != null) return;
         new GameObject("Crosshair HUD").AddComponent<Crosshair>();

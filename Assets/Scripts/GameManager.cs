@@ -22,6 +22,13 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        ComboSystem.Create();
+        WaveManager.Create();
+        PlayerUpgrades.Create();
+        AdPopups.Create();
+        Crosshair.Create();
+        DamageIndicator.Create();
+
         titlePanel.SetActive(true);
         resultPanel.SetActive(false);
         Time.timeScale = 0f;

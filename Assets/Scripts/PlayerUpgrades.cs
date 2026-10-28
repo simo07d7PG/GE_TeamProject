@@ -16,8 +16,7 @@ public class PlayerUpgrades : MonoBehaviour
     public static bool RapidFire { get { return Instance != null && Time.time < Instance.rapidUntil; } }
     public static bool Pierce { get { return Instance != null && Time.time < Instance.pierceUntil; } }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Create()
+    public static void Create()
     {
         if (Instance != null) return;
         new GameObject("PlayerUpgrades").AddComponent<PlayerUpgrades>();

@@ -31,8 +31,7 @@ public class DamageIndicator : MonoBehaviour
         }
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Create()
+    public static void Create()
     {
         if (Instance != null) return;
         new GameObject("DamageIndicator").AddComponent<DamageIndicator>();

@@ -22,8 +22,7 @@ public class WaveManager : MonoBehaviour
     private GameObject bossPrefab;
     private readonly Dictionary<EnemySpawner, int> baseMaxAlive = new Dictionary<EnemySpawner, int>();
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Create()
+    public static void Create()
     {
         if (Instance != null) return;
         new GameObject("WaveManager").AddComponent<WaveManager>();

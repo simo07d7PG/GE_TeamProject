@@ -21,8 +21,7 @@ public class ComboSystem : MonoBehaviour
         }
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Create()
+    public static void Create()
     {
         if (Instance != null) return;
         new GameObject("ComboSystem").AddComponent<ComboSystem>();
