@@ -29,10 +29,8 @@ public class GameManager : MonoBehaviour
         Crosshair.Create();
         DamageIndicator.Create();
 
-        titlePanel.SetActive(true);
+        titlePanel.SetActive(false);
         resultPanel.SetActive(false);
-        Time.timeScale = 0f;
-        Cursor.lockState = CursorLockMode.None;
         UpdateScoreText();
     }
 
@@ -42,6 +40,7 @@ public class GameManager : MonoBehaviour
         playerShooter = player.GetComponentInChildren<PlayerShooter>();
         playerStartPosition = player.transform.position;
         playerStartRotation = player.transform.rotation;
+        StartGame();
     }
 
     public void StartGame()
