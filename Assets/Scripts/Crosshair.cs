@@ -40,16 +40,6 @@ public class Crosshair : MonoBehaviour
         Instance = this;
     }
 
-    void OnEnable()
-    {
-        Bullet.OnPlayerHit += OnPlayerHit;
-    }
-
-    void OnDisable()
-    {
-        Bullet.OnPlayerHit -= OnPlayerHit;
-    }
-
     void Update()
     {
         if (markerTimer > 0f) markerTimer -= Time.unscaledDeltaTime;
@@ -64,7 +54,7 @@ public class Crosshair : MonoBehaviour
             && hit.collider.CompareTag("Enemy");
     }
 
-    void OnPlayerHit(bool killed)
+    public void OnPlayerHit(bool killed)
     {
         if (!killed && markerKill && markerTimer > 0f) return;
 

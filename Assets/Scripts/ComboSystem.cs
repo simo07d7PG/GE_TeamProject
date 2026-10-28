@@ -38,16 +38,6 @@ public class ComboSystem : MonoBehaviour
         Instance = this;
     }
 
-    void OnEnable()
-    {
-        Health.OnEnemyKilled += OnEnemyKilled;
-    }
-
-    void OnDisable()
-    {
-        Health.OnEnemyKilled -= OnEnemyKilled;
-    }
-
     void Update()
     {
         if (combo == 0 || Time.timeScale == 0f) return;
@@ -56,7 +46,7 @@ public class ComboSystem : MonoBehaviour
         if (timer <= 0f) combo = 0;
     }
 
-    void OnEnemyKilled(Health enemy)
+    public void AddKill()
     {
         combo++;
         timer = comboWindow;

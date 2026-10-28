@@ -8,9 +8,6 @@ public class Health : MonoBehaviour
     public int score = 10;
     public Slider hpSlider;
 
-    public static event System.Action<Health> OnEnemyKilled;
-    public static event System.Action<Health, Vector3> OnPlayerDamaged;
-
     public float invincibilityDuration = 1.5f; 
     public float blinkInterval = 0.1f;        
     private bool isInvincible = false;       
@@ -50,8 +47,8 @@ public class Health : MonoBehaviour
         UpdateBar();
 
         bool isPlayer = CompareTag("Player");
-        if (isPlayer) OnPlayerDamaged?.Invoke(this, hitDirection);
-        else PlayHitFeedback(hitDirection);
+        if (!isPlayer) PlayHitFeedback(hitDirection);
+        else if (DamageIndicator.Instance != null) DamageIndicator.Instance.OnPlayerDamaged(this, hitDirection);
 
         if (currentHp <= 0)
         {
@@ -145,10 +142,9 @@ public class Health : MonoBehaviour
         }
         else
         {
-            if (gm != null) gm.AddScore(score);
             Fx.Burst(transform.position + Vector3.up * 0.5f, new Color(0.4f, 1f, 0.9f));
             Fx.Blip(transform.position, 260f, 0.18f, 0.6f);
-            OnEnemyKilled?.Invoke(this);
+            if (gm != null) gm.OnEnemyKilled(this);
             Destroy(gameObject);
         }
     }

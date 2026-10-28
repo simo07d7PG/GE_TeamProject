@@ -8,8 +8,6 @@ public class Bullet : MonoBehaviour
     public string ownerTag = "Player";
     public bool pierce;
 
-    public static event System.Action<bool> OnPlayerHit;
-
     void Start()
     {
         Destroy(gameObject, lifeTime);
@@ -26,7 +24,7 @@ public class Bullet : MonoBehaviour
             if (hp != null && hp.currentHp > 0)
             {
                 hp.TakeDamage(damage, transform.forward);
-                if (ownerTag == "Player") OnPlayerHit?.Invoke(hp.currentHp <= 0);
+                if (ownerTag == "Player" && Crosshair.Instance != null) Crosshair.Instance.OnPlayerHit(hp.currentHp <= 0);
             }
             if (pierce) return;
         }

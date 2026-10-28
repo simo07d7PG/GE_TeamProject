@@ -33,17 +33,7 @@ public class PlayerUpgrades : MonoBehaviour
         Instance = this;
     }
 
-    void OnEnable()
-    {
-        Health.OnEnemyKilled += OnEnemyKilled;
-    }
-
-    void OnDisable()
-    {
-        Health.OnEnemyKilled -= OnEnemyKilled;
-    }
-
-    void OnEnemyKilled(Health enemy)
+    public void TryDrop(Health enemy)
     {
         bool isBoss = enemy.GetComponent<EnemyBoss>() != null;
         if (!isBoss && Random.value > dropChance) return;

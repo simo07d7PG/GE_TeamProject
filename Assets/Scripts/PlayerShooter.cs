@@ -23,16 +23,6 @@ public class PlayerShooter : MonoBehaviour
         mainCam = Camera.main;
     }
 
-    void OnEnable()
-    {
-        Health.OnEnemyKilled += OnEnemyKilled;
-    }
-
-    void OnDisable()
-    {
-        Health.OnEnemyKilled -= OnEnemyKilled;
-    }
-
     void Update()
     {
         if (Time.timeScale == 0f) return;
@@ -41,7 +31,7 @@ public class PlayerShooter : MonoBehaviour
         if (overheated && weaponHeat <= overheatUnlock) overheated = false;
     }
 
-    void OnEnemyKilled(Health enemy)
+    public void CoolOnKill()
     {
         weaponHeat = Mathf.Max(0f, weaponHeat - killCool);
     }

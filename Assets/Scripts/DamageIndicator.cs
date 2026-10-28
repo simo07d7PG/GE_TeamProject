@@ -48,16 +48,6 @@ public class DamageIndicator : MonoBehaviour
         Instance = this;
     }
 
-    void OnEnable()
-    {
-        Health.OnPlayerDamaged += OnPlayerDamaged;
-    }
-
-    void OnDisable()
-    {
-        Health.OnPlayerDamaged -= OnPlayerDamaged;
-    }
-
     void Update()
     {
         if (Time.timeScale == 0f) return;
@@ -72,7 +62,7 @@ public class DamageIndicator : MonoBehaviour
         }
     }
 
-    void OnPlayerDamaged(Health hp, Vector3 hitDirection)
+    public void OnPlayerDamaged(Health hp, Vector3 hitDirection)
     {
         player = hp;
         flashTimer = flashTime;

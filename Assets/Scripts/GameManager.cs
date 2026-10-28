@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public EnemySpawner[] spawners;
 
     private GameObject player;
+    private PlayerShooter playerShooter;
     private Vector3 playerStartPosition;
     private Quaternion playerStartRotation;
     private int score;
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         player = GameObject.FindWithTag("Player");
+        playerShooter = player.GetComponentInChildren<PlayerShooter>();
         playerStartPosition = player.transform.position;
         playerStartRotation = player.transform.rotation;
     }
@@ -50,6 +52,14 @@ public class GameManager : MonoBehaviour
         if (!isPlaying) return;
         score += amount * ComboSystem.Multiplier;
         UpdateScoreText();
+    }
+
+    public void OnEnemyKilled(Health enemy)
+    {
+        AddScore(enemy.score);
+        if (ComboSystem.Instance != null) ComboSystem.Instance.AddKill();
+        if (PlayerUpgrades.Instance != null) PlayerUpgrades.Instance.TryDrop(enemy);
+        if (playerShooter != null) playerShooter.CoolOnKill();
     }
 
     public void GameOver()
@@ -73,8 +83,7 @@ public class GameManager : MonoBehaviour
         player.transform.SetPositionAndRotation(playerStartPosition, playerStartRotation);
         controller.enabled = true;
         player.GetComponent<Health>().ResetHp();
-        PlayerShooter shooter = player.GetComponentInChildren<PlayerShooter>();
-        if (shooter != null) shooter.ResetWeaponHeat();
+        if (playerShooter != null) playerShooter.ResetWeaponHeat();
         if (ComboSystem.Instance != null) ComboSystem.Instance.ResetCombo();
         if (PlayerUpgrades.Instance != null) PlayerUpgrades.Instance.ResetUpgrades();
         foreach (Pickup p in FindObjectsByType<Pickup>(FindObjectsSortMode.None)) Destroy(p.gameObject);
