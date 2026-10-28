@@ -68,6 +68,8 @@ public class GameManager : MonoBehaviour
         player.transform.SetPositionAndRotation(playerStartPosition, playerStartRotation);
         controller.enabled = true;
         player.GetComponent<Health>().ResetHp();
+        PlayerShooter shooter = player.GetComponentInChildren<PlayerShooter>();
+        if (shooter != null) shooter.ResetWeaponHeat();
 
         heatGauge.ResetHeat();
         foreach (EnemySpawner s in spawners) s.ResetSpawner();
