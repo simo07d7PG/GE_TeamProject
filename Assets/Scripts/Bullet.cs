@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
     public string ownerTag = "Player";
     public bool pierce;
 
+    public static event System.Action<bool> OnPlayerHit;
+
     void Start()
     {
         Destroy(gameObject, lifeTime);
@@ -21,7 +23,11 @@ public class Bullet : MonoBehaviour
         if (other.CompareTag(targetTag))
         {
             Health hp = other.GetComponent<Health>();
-            if (hp != null) hp.TakeDamage(damage, transform.forward);
+            if (hp != null && hp.currentHp > 0)
+            {
+                hp.TakeDamage(damage, transform.forward);
+                if (ownerTag == "Player") OnPlayerHit?.Invoke(hp.currentHp <= 0);
+            }
             if (pierce) return;
         }
         Destroy(gameObject);
