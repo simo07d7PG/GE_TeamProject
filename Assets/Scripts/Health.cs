@@ -17,6 +17,7 @@ public class Health : MonoBehaviour
     public float knockbackDecay = 12f;
     public float flashDuration = 0.06f;
     private Vector3 knockback;
+    private CharacterController controller;
     private bool isFlashing;
     private Vector3 flashBaseScale;
     private Material[][] flashOriginals;
@@ -29,13 +30,15 @@ public class Health : MonoBehaviour
         UpdateBar();
 
         renderers = GetComponentsInChildren<Renderer>();
+        controller = GetComponent<CharacterController>();
     }
 
     void Update()
     {
         if (knockback.sqrMagnitude < 0.01f) return;
 
-        transform.position += knockback * Time.deltaTime;
+        if (controller != null) controller.Move(knockback * Time.deltaTime);
+        else transform.position += knockback * Time.deltaTime;
         knockback = Vector3.MoveTowards(knockback, Vector3.zero, knockbackDecay * Time.deltaTime);
     }
 

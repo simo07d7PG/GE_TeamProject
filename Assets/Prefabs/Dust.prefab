@@ -63,8 +63,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.6211083, y: 1.6213486, z: 1.7978027}
-  m_Center: {x: -0.011273831, y: 0.036720157, z: -0.0058737993}
+  m_Size: {x: 1.98, y: 2.09, z: 2.09}
+  m_Center: {x: 0, y: 0.09, z: 0.05}
 --- !u!23 &5203380423427921015
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -130,6 +130,11 @@ MonoBehaviour:
   currentHp: 0
   score: 5
   hpSlider: {fileID: 0}
+  invincibilityDuration: 1.5
+  blinkInterval: 0.1
+  knockbackForce: 4
+  knockbackDecay: 12
+  flashDuration: 0.06
 --- !u!1001 &4945802545430035703
 PrefabInstance:
   m_ObjectHideFlags: 0

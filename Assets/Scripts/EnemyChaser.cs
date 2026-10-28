@@ -9,26 +9,28 @@ public class EnemyChaser : MonoBehaviour
     public float attackCooldown = 1f;
 
     private Transform player;
+    private EnemyMove mover;
     private float lastAttackTime = -999f;
 
     void Start()
     {
         GameObject p = GameObject.FindWithTag("Player");
         if (p != null) player = p.transform;
+        mover = GetComponent<EnemyMove>();
     }
 
     void Update()
     {
         if (player == null) return;
 
-        Vector3 toPlayer = player.position - transform.position;
+        Vector3 toPlayer = player.position + Vector3.up - transform.position;
         float distance = toPlayer.magnitude;
         if (distance > detectRange) return;
 
         transform.forward = toPlayer.normalized;
         if (distance > attackRange)
         {
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
+            mover.Fly(transform.forward, moveSpeed);
         }
         else if (Time.time >= lastAttackTime + attackCooldown)
         {

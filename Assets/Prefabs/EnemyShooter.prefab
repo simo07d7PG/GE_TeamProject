@@ -41,10 +41,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1911438128747117553}
   - component: {fileID: 4321625755541349929}
-  - component: {fileID: 7441210567161665279}
   - component: {fileID: 1943691070806070307}
   - component: {fileID: 5769933472880452927}
   - component: {fileID: 360758191350282406}
+  - component: {fileID: 1911135157470955666}
+  - component: {fileID: 4174611322777192416}
+  - component: {fileID: 251179050837693580}
   m_Layer: 0
   m_Name: EnemyShooter
   m_TagString: Enemy
@@ -77,27 +79,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8530940423303685907}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &7441210567161665279
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8530940423303685907}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.4675597, y: 1.309363, z: 1}
-  m_Center: {x: -0.00766021, y: 0.15468155, z: 0}
 --- !u!23 &1943691070806070307
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -163,6 +144,11 @@ MonoBehaviour:
   currentHp: 0
   score: 15
   hpSlider: {fileID: 0}
+  invincibilityDuration: 1.5
+  blinkInterval: 0.1
+  knockbackForce: 4
+  knockbackDecay: 12
+  flashDuration: 0.06
 --- !u!114 &360758191350282406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,6 +168,66 @@ MonoBehaviour:
   fireRange: 12
   fireInterval: 2
   bulletSpeed: 10
+--- !u!143 &1911135157470955666
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8530940423303685907}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.62
+  m_Radius: 0.6
+  m_SlopeLimit: 45
+  m_StepOffset: 0
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.17, z: 0}
+--- !u!65 &4174611322777192416
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8530940423303685907}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.91, y: 1.78, z: 1.32}
+  m_Center: {x: 0.03, y: 0.17, z: 0}
+--- !u!114 &251179050837693580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8530940423303685907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1f48d3cb10751b44a3b968e9a816ea5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMove
+  blockedRatio: 0.25
+  holdHeight: 1
 --- !u!1001 &2331345049872444096
 PrefabInstance:
   m_ObjectHideFlags: 0

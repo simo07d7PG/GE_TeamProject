@@ -9,12 +9,14 @@ public class EnemyAdBot : MonoBehaviour
     public float popupDuration = 5f;
 
     private Transform player;
+    private EnemyMove mover;
     private float lastPopupTime;
 
     void Start()
     {
         GameObject p = GameObject.FindWithTag("Player");
         if (p != null) player = p.transform;
+        mover = GetComponent<EnemyMove>();
         lastPopupTime = Time.time;
     }
 
@@ -28,10 +30,8 @@ public class EnemyAdBot : MonoBehaviour
         if (distance > detectRange) return;
 
         transform.forward = toPlayer.normalized;
-        if (distance > keepDistance)
-        {
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
-        }
+        Vector3 move = distance > keepDistance ? transform.forward : Vector3.zero;
+        mover.Fly(move, moveSpeed);
 
         if (Time.time >= lastPopupTime + popupInterval && AdPopups.Instance != null)
         {

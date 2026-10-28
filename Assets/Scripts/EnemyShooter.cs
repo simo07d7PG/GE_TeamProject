@@ -11,12 +11,14 @@ public class EnemyShooter : MonoBehaviour
     public float bulletSpeed = 10f;
 
     private Transform player;
+    private EnemyMove mover;
     private float lastFireTime;
 
     void Start()
     {
         GameObject p = GameObject.FindWithTag("Player");
         if (p != null) player = p.transform;
+        mover = GetComponent<EnemyMove>();
         lastFireTime = Time.time;
     }
 
@@ -29,10 +31,8 @@ public class EnemyShooter : MonoBehaviour
         float distance = toPlayer.magnitude;
         transform.forward = toPlayer.normalized;
 
-        if (distance > keepDistance)
-        {
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
-        }
+        Vector3 move = distance > keepDistance ? transform.forward : Vector3.zero;
+        mover.Fly(move, moveSpeed);
 
         bool inRange = distance < fireRange;
         bool ready = Time.time >= lastFireTime + fireInterval;
