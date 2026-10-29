@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     private int score;
     private bool isPlaying;
 
+    public bool IsPlaying => isPlaying;
+
     void Awake()
     {
         Instance = this;
