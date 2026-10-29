@@ -14,11 +14,12 @@ public class HeatGauge : MonoBehaviour
     public float maxHeat = 100f;
     public int enemyThreshold = 5;
     public AnimationCurve heatRiseCurve = new AnimationCurve(
-        new Keyframe(0f, 0f, 0f, 1f),
-        new Keyframe(1f, 1f, 1f, 0.75f),
-        new Keyframe(5f, 4f, 0.75f, 1.2f),
-        new Keyframe(10f, 10f, 1.2f, 1.2f));
-    public float maxRisePerSecond = 12f;
+        new Keyframe(0f, 0f, 0f, 0.3f),
+        new Keyframe(1f, 0.3f, 0.3f, 0.225f),
+        new Keyframe(5f, 1.2f, 0.225f, 0.36f),
+        new Keyframe(10f, 3f, 0.36f, 0.2f),
+        new Keyframe(15f, 4f, 0.2f, 0f));
+    public float maxRisePerSecond = 4f;
     public float coolPerSecond = 1f;
     public float riseMultiplier = 1f;
     public float coolMultiplier = 1f;
