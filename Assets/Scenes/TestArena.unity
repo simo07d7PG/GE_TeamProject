@@ -638,6 +638,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7635826562936255635, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 14ec0ea2d4eeb4b44b0f3407702cc54e, type: 2}
     - target: {fileID: 919132149155446097, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
       propertyPath: m_Name
       value: "\uB7A8 (1)"
@@ -919,6 +923,55 @@ PhysicsMaterial:
   m_Bounciness: 0
   m_FrictionCombine: 0
   m_BounceCombine: 0
+--- !u!1 &207461059
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 207461060}
+  - component: {fileID: 207461061}
+  m_Layer: 0
+  m_Name: GlowVolume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &207461060
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207461059}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2086665470}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &207461061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207461059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 1
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: a1b75161aec7b7946990c34a3e169ce9, type: 2}
 --- !u!1001 &262718443
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -983,6 +1036,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7635826562936255635, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 14ec0ea2d4eeb4b44b0f3407702cc54e, type: 2}
     - target: {fileID: 919132149155446097, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
       propertyPath: m_Name
       value: "\uB7A8 (3)"
@@ -1627,6 +1684,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7635826562936255635, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 14ec0ea2d4eeb4b44b0f3407702cc54e, type: 2}
     - target: {fileID: 919132149155446097, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
       propertyPath: m_Name
       value: "\uB7A8"
@@ -5398,7 +5459,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -5768,6 +5829,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7635826562936255635, guid: 7065612a84f345b4f959864d638bea4c, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 68000c2faf1341642878a82a1c988e0d, type: 2}
     - target: {fileID: 919132149155446097, guid: 7065612a84f345b4f959864d638bea4c, type: 3}
       propertyPath: m_Name
       value: "\uBA54\uC778\uBCF4\uB4DC"
@@ -6936,6 +7001,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7635826562936255635, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 14ec0ea2d4eeb4b44b0f3407702cc54e, type: 2}
     - target: {fileID: 919132149155446097, guid: 6547f3b49189cba4eb26b7086bc03555, type: 3}
       propertyPath: m_Name
       value: "\uB7A8 (2)"
@@ -9096,6 +9165,7 @@ Transform:
   - {fileID: 2007509840}
   - {fileID: 303345976}
   - {fileID: 1935609896}
+  - {fileID: 207461060}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2103418038
