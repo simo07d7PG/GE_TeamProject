@@ -20,6 +20,7 @@ public class WaveManager : MonoBehaviour
     private float bannerUntil;
     private GUIStyle bannerStyle;
     private GUIStyle infoStyle;
+    private GUIStyle bossNameStyle;
     private GameObject bossPrefab;
     private GameObject boss;
     private Health finalBoss;
@@ -92,7 +93,7 @@ public class WaveManager : MonoBehaviour
 
         if (phase == totalPhases)
         {
-            ShowBanner("PHASE " + phase + "  FINAL BOSS!", 2.5f);
+            ShowBanner("FINAL BOSS!", 2.5f);
             SpawnBoss(finalBossHpMultiplier);
             if (boss != null) finalBoss = boss.GetComponent<Health>();
         }
@@ -169,6 +170,22 @@ public class WaveManager : MonoBehaviour
         EndPhase();
     }
 
+    void DrawFinalBossBar()
+    {
+        float width = Screen.width * 0.5f;
+        float height = 22f;
+        Rect back = new Rect((Screen.width - width) * 0.5f, 8f, width, height);
+
+        GUI.color = new Color(0f, 0f, 0f, 0.75f);
+        GUI.DrawTexture(back, Texture2D.whiteTexture);
+        GUI.color = new Color(0.85f, 0.1f, 0.4f);
+        float ratio = Mathf.Clamp01((float)finalBoss.currentHp / finalBoss.maxHp);
+        GUI.DrawTexture(new Rect(back.x + 2f, back.y + 2f, (width - 4f) * ratio, height - 4f), Texture2D.whiteTexture);
+
+        GUI.color = Color.white;
+        GUI.Label(back, "FINAL BOSS", bossNameStyle);
+    }
+
     void OnGUI()
     {
         if (!active || Time.timeScale == 0f) return;
@@ -181,14 +198,26 @@ public class WaveManager : MonoBehaviour
             bannerStyle.fontStyle = FontStyle.Bold;
 
             infoStyle = new GUIStyle(GUI.skin.label);
-            infoStyle.alignment = TextAnchor.MiddleRight;
+            infoStyle.alignment = TextAnchor.MiddleCenter;
             infoStyle.fontSize = 22;
             infoStyle.fontStyle = FontStyle.Bold;
+
+            bossNameStyle = new GUIStyle(GUI.skin.label);
+            bossNameStyle.alignment = TextAnchor.MiddleCenter;
+            bossNameStyle.fontSize = 14;
+            bossNameStyle.fontStyle = FontStyle.Bold;
         }
 
-        string info = IsBossPhase() ? "PHASE " + phase + "  BOSS" : "PHASE " + phase + "  " + Mathf.CeilToInt(Mathf.Max(0f, timer)) + "s";
-        GUI.color = Color.white;
-        GUI.Label(new Rect(Screen.width - 310f, 10f, 300f, 32f), info, infoStyle);
+        if (FinalBossActive)
+        {
+            DrawFinalBossBar();
+        }
+        else if (phase != totalPhases)
+        {
+            string info = IsBossPhase() ? "PHASE " + phase + "  BOSS" : "PHASE " + phase + "  " + Mathf.CeilToInt(Mathf.Max(0f, timer)) + "s";
+            GUI.color = Color.white;
+            GUI.Label(new Rect((Screen.width - 300f) * 0.5f, 10f, 300f, 32f), info, infoStyle);
+        }
 
         if (Time.time < bannerUntil)
         {

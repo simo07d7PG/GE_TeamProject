@@ -7,6 +7,8 @@ public static class Fx
     private static Material particleMaterial;
     private static AudioClip fanClipLow;
     private static AudioClip fanClipHigh;
+    private static AudioClip tickHitClip;
+    private static AudioClip tickKillClip;
     private static readonly Dictionary<int, AudioClip> clips = new Dictionary<int, AudioClip>();
 
     public static Material FlashMaterial
@@ -100,6 +102,49 @@ public static class Fx
             clips[key] = clip;
         }
         AudioSource.PlayClipAtPoint(clip, position, volume);
+    }
+
+    public static void HitTick(bool kill, float volume = 0.5f)
+    {
+        AudioClip clip;
+        if (kill)
+        {
+            if (tickKillClip == null) tickKillClip = CreateTickClip("tick_kill", 2600f, 0.14f);
+            clip = tickKillClip;
+        }
+        else
+        {
+            if (tickHitClip == null) tickHitClip = CreateTickClip("tick_hit", 1700f, 0.06f);
+            clip = tickHitClip;
+        }
+
+        GameObject go = new GameObject("FxTick");
+        AudioSource source = go.AddComponent<AudioSource>();
+        source.clip = clip;
+        source.volume = volume;
+        source.spatialBlend = 0f;
+        source.Play();
+        Object.Destroy(go, clip.length + 0.1f);
+    }
+
+    private static AudioClip CreateTickClip(string clipName, float frequency, float duration)
+    {
+        const int sampleRate = 44100;
+        int sampleCount = Mathf.CeilToInt(sampleRate * duration);
+        float[] data = new float[sampleCount];
+
+        float phase = 0f;
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleCount;
+            phase += 2f * Mathf.PI * frequency / sampleRate;
+            float envelope = Mathf.Exp(-t * 7f) * Mathf.Min(1f, i / 24f);
+            data[i] = (Mathf.Sin(phase) * 0.7f + Mathf.Sin(phase * 2f) * 0.3f) * envelope;
+        }
+
+        AudioClip clip = AudioClip.Create(clipName, sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
     }
 
     public static AudioClip FanClipLow()

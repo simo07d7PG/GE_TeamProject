@@ -7,6 +7,7 @@ public class Health : MonoBehaviour
     public int currentHp;
     public int score = 10;
     public Slider hpSlider;
+    public Text hpText;
 
     public float invincibilityDuration = 1.5f; 
     public float blinkInterval = 0.1f;        
@@ -133,6 +134,7 @@ public class Health : MonoBehaviour
     void UpdateBar()
     {
         if (hpSlider != null) hpSlider.value = (float)currentHp / maxHp;
+        if (hpText != null) hpText.text = Mathf.Max(0, currentHp) + "/" + maxHp;
     }
 
     void Die()

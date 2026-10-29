@@ -78,11 +78,12 @@ public class EnemyBoss : MonoBehaviour
     void OnGUI()
     {
         if (Time.timeScale == 0f || health == null) return;
+        if (WaveManager.Instance != null && WaveManager.Instance.FinalBoss == health) return;
 
         float width = 360f;
         float height = 16f;
         int index = bosses.IndexOf(this);
-        Rect back = new Rect((Screen.width - width) * 0.5f, 20f + index * 26f, width, height);
+        Rect back = new Rect((Screen.width - width) * 0.5f, 48f + index * 26f, width, height);
 
         GUI.color = new Color(0f, 0f, 0f, 0.7f);
         GUI.DrawTexture(back, Texture2D.whiteTexture);

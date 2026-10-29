@@ -18,10 +18,11 @@ public class AdPopups : MonoBehaviour
     private const int MaxPopups = 6;
     private static readonly string[] Texts =
     {
-        "YOU WON\n$1,000,000!!",
         "FREE VIRUS\nSCAN NOW",
-        "HOT SINGLES\nNEAR YOU",
         "CLICK HERE\nTO CLAIM",
+        "YOUR PC IS\nRUNNING SLOW",
+        "DOWNLOAD\nMORE RAM",
+        "UPDATE\nREQUIRED",
     };
 
     private readonly List<Popup> popups = new List<Popup>();

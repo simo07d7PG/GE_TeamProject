@@ -58,29 +58,6 @@ public class PlayerShooter : MonoBehaviour
         overheated = false;
     }
 
-    void OnGUI()
-    {
-        if (Time.timeScale == 0f) return;
-
-        float width = 220f;
-        float height = 14f;
-        Rect back = new Rect((Screen.width - width) * 0.5f, Screen.height - 60f, width, height);
-
-        GUI.color = new Color(0f, 0f, 0f, 0.6f);
-        GUI.DrawTexture(back, Texture2D.whiteTexture);
-
-        float ratio = Mathf.Clamp01(weaponHeat / 100f);
-        GUI.color = overheated ? Color.red : Color.Lerp(Color.cyan, new Color(1f, 0.5f, 0f), ratio);
-        GUI.DrawTexture(new Rect(back.x + 2f, back.y + 2f, (width - 4f) * ratio, height - 4f), Texture2D.whiteTexture);
-
-        if (overheated)
-        {
-            GUI.color = Color.red;
-            GUI.Label(new Rect(back.x, back.y - 22f, width, 20f), "OVERHEAT");
-        }
-        GUI.color = Color.white;
-    }
-
     public void OnAttack(InputValue value)
     {
         Fire();
