@@ -14,10 +14,18 @@ public class PlayerShooter : MonoBehaviour
     public float overheatUnlock = 40f;
     public float overheatSystemHeat = 10f;
 
+    public float gunHeatMultiplier = 1f;
+    public float gunCoolMultiplier = 1f;
+    public float damageMultiplier = 1f;
+    public float fireRateMultiplier = 1f;
+    public float bulletSpeedMultiplier = 1f;
+    public bool autoFire;
+
     private float lastFireTime = -999f;
     private Camera mainCam;
     private float weaponHeat;
     private bool overheated;
+    private InputAction attackAction;
 
     public float GunHeatRatio => Mathf.Clamp01(weaponHeat / 100f);
     public bool Overheated => overheated;
@@ -25,14 +33,18 @@ public class PlayerShooter : MonoBehaviour
     void Start()
     {
         mainCam = Camera.main;
+        PlayerInput playerInput = GetComponentInParent<PlayerInput>();
+        if (playerInput != null && playerInput.actions != null) attackAction = playerInput.actions.FindAction("Attack");
     }
 
     void Update()
     {
         if (Time.timeScale == 0f) return;
 
-        weaponHeat = Mathf.Max(0f, weaponHeat - coolPerSecond * Time.deltaTime);
+        weaponHeat = Mathf.Max(0f, weaponHeat - coolPerSecond * gunCoolMultiplier * Time.deltaTime);
         if (overheated && weaponHeat <= overheatUnlock) overheated = false;
+
+        if (autoFire && attackAction != null && attackAction.IsPressed()) Fire();
     }
 
     public void CoolOnKill()
@@ -71,13 +83,18 @@ public class PlayerShooter : MonoBehaviour
 
     public void OnAttack(InputValue value)
     {
+        Fire();
+    }
+
+    void Fire()
+    {
         if (Time.timeScale == 0f) return;
         if (overheated) return;
-        float cooldown = PlayerUpgrades.RapidFire ? fireCooldown * 0.5f : fireCooldown;
+        float cooldown = (PlayerUpgrades.RapidFire ? fireCooldown * 0.5f : fireCooldown) / Mathf.Max(0.1f, fireRateMultiplier);
         if (Time.time < lastFireTime + cooldown) return;
         lastFireTime = Time.time;
 
-        weaponHeat += heatPerShot;
+        weaponHeat += heatPerShot * gunHeatMultiplier;
         if (weaponHeat >= 100f)
         {
             weaponHeat = 100f;
@@ -105,8 +122,13 @@ public class PlayerShooter : MonoBehaviour
         {
             Vector3 dir = Quaternion.AngleAxis(angle, Vector3.up) * fireDirection;
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(dir));
-            bullet.GetComponent<Rigidbody>().linearVelocity = dir * bulletSpeed;
-            bullet.GetComponent<Bullet>().pierce = PlayerUpgrades.Pierce;
+            bullet.GetComponent<Rigidbody>().linearVelocity = dir * bulletSpeed * bulletSpeedMultiplier;
+            Bullet b = bullet.GetComponent<Bullet>();
+            b.pierce = PlayerUpgrades.Pierce;
+            float scaled = b.damage * damageMultiplier;
+            int damage = Mathf.FloorToInt(scaled);
+            if (Random.value < scaled - damage) damage++;
+            b.damage = damage;
         }
     }
 }

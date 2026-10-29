@@ -7,6 +7,7 @@ public class ComboSystem : MonoBehaviour
     public float comboWindow = 3f;
     public int killsPerStep = 3;
     public int maxMultiplier = 5;
+    public float scoreBonus;
 
     private int combo;
     private float timer;
@@ -18,6 +19,15 @@ public class ComboSystem : MonoBehaviour
         {
             if (Instance == null) return 1;
             return Mathf.Min(1 + Instance.combo / Instance.killsPerStep, Instance.maxMultiplier);
+        }
+    }
+
+    public static float TotalMultiplier
+    {
+        get
+        {
+            if (Instance == null) return 1f;
+            return Multiplier * (1f + Instance.scoreBonus);
         }
     }
 
@@ -73,7 +83,7 @@ public class ComboSystem : MonoBehaviour
         Rect area = new Rect((Screen.width - width) * 0.5f, 70f, width, 40f);
 
         GUI.color = Color.Lerp(Color.white, Color.yellow, (Multiplier - 1) / (float)Mathf.Max(1, maxMultiplier - 1));
-        GUI.Label(area, "COMBO " + combo + "  x" + Multiplier, style);
+        GUI.Label(area, "COMBO " + combo + "  x" + TotalMultiplier.ToString("0.##"), style);
 
         GUI.color = new Color(0f, 0f, 0f, 0.6f);
         GUI.DrawTexture(new Rect(area.x, area.yMax, width, 6f), Texture2D.whiteTexture);

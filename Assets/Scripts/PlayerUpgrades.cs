@@ -6,6 +6,7 @@ public class PlayerUpgrades : MonoBehaviour
 
     public float duration = 10f;
     public float dropChance = 0.2f;
+    public float dropMultiplier = 1f;
 
     private float tripleUntil;
     private float rapidUntil;
@@ -35,7 +36,7 @@ public class PlayerUpgrades : MonoBehaviour
     public void TryDrop(Health enemy)
     {
         bool isBoss = enemy.GetComponent<EnemyBoss>() != null;
-        if (!isBoss && Random.value > dropChance) return;
+        if (!isBoss && Random.value > dropChance * dropMultiplier) return;
 
         PickupType type = (PickupType)Random.Range(0, System.Enum.GetValues(typeof(PickupType)).Length);
         Pickup.Create(enemy.transform.position, type);

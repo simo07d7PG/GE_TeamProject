@@ -13,6 +13,8 @@ public class AdPopups : MonoBehaviour
 
     public static AdPopups Instance { get; private set; }
 
+    public float blockChance;
+
     private const int MaxPopups = 6;
     private static readonly string[] Texts =
     {
@@ -44,6 +46,7 @@ public class AdPopups : MonoBehaviour
     public void Spawn(Object owner, float duration)
     {
         if (popups.Count >= MaxPopups) return;
+        if (Random.value < blockChance) return;
 
         Vector2 size = new Vector2(220f, 110f);
         Rect rect;

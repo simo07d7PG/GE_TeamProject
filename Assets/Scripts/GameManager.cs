@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -7,8 +8,10 @@ public class GameManager : MonoBehaviour
 
     public GameObject titlePanel;
     public GameObject resultPanel;
+    public GameObject clearPanel;
     public Text scoreText;
     public Text resultScoreText;
+    public Text clearScoreText;
     public HeatGauge heatGauge;
     public EnemySpawner[] spawners;
 
@@ -31,6 +34,7 @@ public class GameManager : MonoBehaviour
 
         titlePanel.SetActive(false);
         resultPanel.SetActive(false);
+        if (clearPanel != null) clearPanel.SetActive(false);
         UpdateScoreText();
     }
 
@@ -47,6 +51,7 @@ public class GameManager : MonoBehaviour
     {
         titlePanel.SetActive(false);
         resultPanel.SetActive(false);
+        if (clearPanel != null) clearPanel.SetActive(false);
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
         isPlaying = true;
@@ -56,7 +61,7 @@ public class GameManager : MonoBehaviour
     public void AddScore(int amount)
     {
         if (!isPlaying) return;
-        score += amount * ComboSystem.Multiplier;
+        score += Mathf.RoundToInt(amount * ComboSystem.TotalMultiplier);
         UpdateScoreText();
     }
 
@@ -79,6 +84,29 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
+    public void GameClear()
+    {
+        if (!isPlaying) return;
+        isPlaying = false;
+        if (WaveManager.Instance != null) WaveManager.Instance.End();
+        if (clearScoreText != null) clearScoreText.text = "SCORE " + score;
+        if (clearPanel != null) clearPanel.SetActive(true);
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public void RestartScene()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void GoToTitle()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Title");
+    }
+
     public void Restart()
     {
         foreach (GameObject e in GameObject.FindGameObjectsWithTag("Enemy")) Destroy(e);
@@ -92,6 +120,7 @@ public class GameManager : MonoBehaviour
         if (playerShooter != null) playerShooter.ResetWeaponHeat();
         if (ComboSystem.Instance != null) ComboSystem.Instance.ResetCombo();
         if (PlayerUpgrades.Instance != null) PlayerUpgrades.Instance.ResetUpgrades();
+        if (AugmentManager.Instance != null) AugmentManager.Instance.ResetAll();
         foreach (Pickup p in FindObjectsByType<Pickup>(FindObjectsSortMode.None)) Destroy(p.gameObject);
 
         heatGauge.ResetHeat();

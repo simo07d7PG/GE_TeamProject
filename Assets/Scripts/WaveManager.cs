@@ -6,22 +6,28 @@ public class WaveManager : MonoBehaviour
     public static WaveManager Instance { get; private set; }
     public static bool SpawnPaused { get; private set; }
 
-    public float waveDuration = 40f;
-    public float restDuration = 5f;
-    public int bossEvery = 3;
+    public int totalPhases = 6;
+    public int midBossPhase = 3;
+    public float phaseDuration = 40f;
+    public int finalBossHpMultiplier = 4;
     public int maxAliveStep = 2;
     public Vector3 bossSpawn = new Vector3(20f, 2f, -10f);
 
     private bool active;
-    private bool resting;
     private float timer;
-    private int wave;
+    private int phase;
     private string banner = "";
     private float bannerUntil;
     private GUIStyle bannerStyle;
     private GUIStyle infoStyle;
     private GameObject bossPrefab;
+    private GameObject boss;
+    private Health finalBoss;
     private readonly Dictionary<EnemySpawner, int> baseMaxAlive = new Dictionary<EnemySpawner, int>();
+
+    public int CurrentPhase => phase;
+    public bool FinalBossActive => active && phase == totalPhases && finalBoss != null;
+    public Health FinalBoss => finalBoss != null ? finalBoss : null;
 
     public static void Create()
     {
@@ -48,9 +54,12 @@ public class WaveManager : MonoBehaviour
             baseMaxAlive[sp] = sp.maxAlive;
         }
 
-        wave = 0;
+        if (boss != null) Destroy(boss);
+        boss = null;
+        finalBoss = null;
+        phase = 0;
         active = true;
-        StartWave();
+        StartPhase();
     }
 
     public void End()
@@ -63,36 +72,68 @@ public class WaveManager : MonoBehaviour
         }
     }
 
-    void StartWave()
+    bool IsBossPhase()
     {
-        wave++;
-        resting = false;
+        return phase == midBossPhase || phase == totalPhases;
+    }
+
+    void StartPhase()
+    {
+        phase++;
         SpawnPaused = false;
-        timer = waveDuration;
+        timer = phaseDuration;
+        boss = null;
+        finalBoss = null;
 
         foreach (KeyValuePair<EnemySpawner, int> pair in baseMaxAlive)
         {
-            if (pair.Key != null) pair.Key.maxAlive = pair.Value + (wave - 1) * maxAliveStep;
+            if (pair.Key != null) pair.Key.maxAlive = pair.Value + (phase - 1) * maxAliveStep;
         }
 
-        bool bossWave = bossEvery > 0 && wave % bossEvery == 0;
-        ShowBanner(bossWave ? "WAVE " + wave + "  BOSS!" : "WAVE " + wave, 2.5f);
-        if (bossWave) SpawnBoss();
+        if (phase == totalPhases)
+        {
+            ShowBanner("PHASE " + phase + "  FINAL BOSS!", 2.5f);
+            SpawnBoss(finalBossHpMultiplier);
+            if (boss != null) finalBoss = boss.GetComponent<Health>();
+        }
+        else if (phase == midBossPhase)
+        {
+            ShowBanner("PHASE " + phase + "  BOSS!", 2.5f);
+            SpawnBoss(1);
+        }
+        else
+        {
+            ShowBanner("PHASE " + phase, 2.5f);
+        }
     }
 
-    void StartRest()
+    void EndPhase()
     {
-        resting = true;
-        SpawnPaused = true;
-        timer = restDuration;
-        ShowBanner("WAVE CLEAR", 2f);
+        if (AugmentManager.Instance != null && AugmentManager.Instance.Open(phase))
+        {
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            StartPhase();
+        }
     }
 
-    void SpawnBoss()
+    public void ContinueAfterAugment()
+    {
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        if (active) StartPhase();
+    }
+
+    void SpawnBoss(int hpMultiplier)
     {
         if (bossPrefab == null) return;
 
-        Instantiate(bossPrefab, bossSpawn, Quaternion.identity);
+        boss = Instantiate(bossPrefab, bossSpawn, Quaternion.identity);
+        Health hp = boss.GetComponent<Health>();
+        if (hp != null) hp.maxHp *= hpMultiplier;
     }
 
     void ShowBanner(string text, float seconds)
@@ -105,11 +146,27 @@ public class WaveManager : MonoBehaviour
     {
         if (!active || Time.timeScale == 0f) return;
 
+        if (IsBossPhase())
+        {
+            if (boss != null) return;
+
+            if (phase == totalPhases)
+            {
+                active = false;
+                SpawnPaused = false;
+                if (GameManager.Instance != null) GameManager.Instance.GameClear();
+            }
+            else
+            {
+                EndPhase();
+            }
+            return;
+        }
+
         timer -= Time.deltaTime;
         if (timer > 0f) return;
 
-        if (resting) StartWave();
-        else StartRest();
+        EndPhase();
     }
 
     void OnGUI()
@@ -129,13 +186,13 @@ public class WaveManager : MonoBehaviour
             infoStyle.fontStyle = FontStyle.Bold;
         }
 
-        string info = resting ? "REST " : "WAVE " + wave + "  ";
+        string info = IsBossPhase() ? "PHASE " + phase + "  BOSS" : "PHASE " + phase + "  " + Mathf.CeilToInt(Mathf.Max(0f, timer)) + "s";
         GUI.color = Color.white;
-        GUI.Label(new Rect(Screen.width - 260f, 10f, 250f, 32f), info + Mathf.CeilToInt(Mathf.Max(0f, timer)) + "s", infoStyle);
+        GUI.Label(new Rect(Screen.width - 310f, 10f, 300f, 32f), info, infoStyle);
 
         if (Time.time < bannerUntil)
         {
-            GUI.color = resting ? Color.green : Color.red;
+            GUI.color = Color.red;
             GUI.Label(new Rect(0f, Screen.height * 0.25f, Screen.width, 70f), banner, bannerStyle);
             GUI.color = Color.white;
         }
