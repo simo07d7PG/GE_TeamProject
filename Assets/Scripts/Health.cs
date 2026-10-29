@@ -8,6 +8,8 @@ public class Health : MonoBehaviour
     public int score = 10;
     public Slider hpSlider;
     public Text hpText;
+    public Image hpFill;
+    public int lowHp = 3;
 
     public float invincibilityDuration = 1.5f; 
     public float blinkInterval = 0.1f;        
@@ -135,6 +137,9 @@ public class Health : MonoBehaviour
     {
         if (hpSlider != null) hpSlider.value = (float)currentHp / maxHp;
         if (hpText != null) hpText.text = Mathf.Max(0, currentHp) + "/" + maxHp;
+        bool low = currentHp <= lowHp;
+        if (hpFill != null) hpFill.color = low ? HudStyle.DANGER : HudStyle.HP;
+        if (hpText != null && hpFill != null) hpText.color = low ? HudStyle.DANGER : HudStyle.TEXT;
     }
 
     void Die()

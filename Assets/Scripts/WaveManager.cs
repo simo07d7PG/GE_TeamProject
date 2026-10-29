@@ -12,15 +12,17 @@ public class WaveManager : MonoBehaviour
     public int finalBossHpMultiplier = 4;
     public int maxAliveStep = 2;
     public Vector3 bossSpawn = new Vector3(20f, 2f, -10f);
+    public float bannerTime = 2f;
 
     private bool active;
     private float timer;
     private int phase;
     private string banner = "";
+    private Color bannerColor;
     private float bannerUntil;
-    private GUIStyle bannerStyle;
-    private GUIStyle infoStyle;
-    private GUIStyle bossNameStyle;
+    private const float TagHeight = 33f;
+    private const float BossBarHeight = 44f;
+    private const float BannerHeight = 22f;
     private GameObject bossPrefab;
     private GameObject boss;
     private Health finalBoss;
@@ -29,6 +31,18 @@ public class WaveManager : MonoBehaviour
     public int CurrentPhase => phase;
     public bool FinalBossActive => active && phase == totalPhases && finalBoss != null;
     public Health FinalBoss => finalBoss != null ? finalBoss : null;
+    public bool BannerVisible => active && Time.time < bannerUntil;
+
+    public static float StackBottom
+    {
+        get
+        {
+            if (Instance == null) return HudStyle.Grid + TagHeight;
+            float bottom = HudStyle.Grid + (Instance.FinalBossActive ? BossBarHeight : TagHeight);
+            if (Instance.BannerVisible) bottom += HudStyle.Grid + BannerHeight;
+            return bottom;
+        }
+    }
 
     public static void Create()
     {
@@ -93,18 +107,18 @@ public class WaveManager : MonoBehaviour
 
         if (phase == totalPhases)
         {
-            ShowBanner("FINAL BOSS!", 2.5f);
+            ShowBanner("FINAL BOSS", HudStyle.DANGER);
             SpawnBoss(finalBossHpMultiplier);
             if (boss != null) finalBoss = boss.GetComponent<Health>();
         }
         else if (phase == midBossPhase)
         {
-            ShowBanner("PHASE " + phase + "  BOSS!", 2.5f);
+            ShowBanner("BOSS DETECTED", HudStyle.DANGER);
             SpawnBoss(1);
         }
         else
         {
-            ShowBanner("PHASE " + phase, 2.5f);
+            ShowBanner("STAGE " + phase + "  START", HudStyle.ACCENT);
         }
     }
 
@@ -137,10 +151,11 @@ public class WaveManager : MonoBehaviour
         if (hp != null) hp.maxHp *= hpMultiplier;
     }
 
-    void ShowBanner(string text, float seconds)
+    void ShowBanner(string text, Color color)
     {
         banner = text;
-        bannerUntil = Time.time + seconds;
+        bannerColor = color;
+        bannerUntil = Time.time + bannerTime;
     }
 
     void Update()
@@ -170,60 +185,83 @@ public class WaveManager : MonoBehaviour
         EndPhase();
     }
 
-    void DrawFinalBossBar()
+    void DrawFinalBossBar(float y)
     {
         float width = Screen.width * 0.5f;
-        float height = 22f;
-        Rect back = new Rect((Screen.width - width) * 0.5f, 8f, width, height);
+        Rect back = new Rect((Screen.width - width) * 0.5f, y, width, BossBarHeight);
+        HudStyle.Frame(back, HudStyle.BG, HudStyle.LINE);
 
-        GUI.color = new Color(0f, 0f, 0f, 0.75f);
-        GUI.DrawTexture(back, Texture2D.whiteTexture);
-        GUI.color = new Color(0.85f, 0.1f, 0.4f);
+        float pad = HudStyle.Grid;
+        HudStyle.Text(new Rect(back.x + pad, back.y + 9f, width * 0.5f, 13f), "FINAL BOSS", 11, HudStyle.DIM, TextAnchor.MiddleLeft, false);
+        string hp = "HP " + Mathf.Max(0, finalBoss.currentHp) + "/" + finalBoss.maxHp;
+        HudStyle.Text(new Rect(back.xMax - pad - width * 0.5f, back.y + 9f, width * 0.5f, 13f), hp, 11, HudStyle.TEXT, TextAnchor.MiddleRight, false);
+
         float ratio = Mathf.Clamp01((float)finalBoss.currentHp / finalBoss.maxHp);
-        GUI.DrawTexture(new Rect(back.x + 2f, back.y + 2f, (width - 4f) * ratio, height - 4f), Texture2D.whiteTexture);
+        HudStyle.Bar(new Rect(back.x + pad, back.y + 24f, width - pad * 2f, 10f), ratio, HudStyle.DANGER);
+    }
 
-        GUI.color = Color.white;
-        GUI.Label(back, "FINAL BOSS", bossNameStyle);
+    void DrawStageTag(float y)
+    {
+        float width = 198f;
+        Rect back = new Rect((Screen.width - width) * 0.5f, y, width, TagHeight);
+        HudStyle.Frame(back, HudStyle.BG, HudStyle.LINE);
+
+        float pad = HudStyle.Grid;
+        HudStyle.Text(new Rect(back.x + pad, back.y, 88f, back.height), "STAGE " + phase + "/" + totalPhases, 11, HudStyle.DIM, TextAnchor.MiddleLeft, false);
+
+        string value;
+        Color color;
+        if (IsBossPhase())
+        {
+            value = "BOSS";
+            color = HudStyle.DANGER;
+        }
+        else
+        {
+            int seconds = Mathf.CeilToInt(Mathf.Max(0f, timer));
+            value = (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00");
+            color = HudStyle.TEXT;
+        }
+        HudStyle.Text(new Rect(back.xMax - pad - 88f, back.y, 88f, back.height), value, 22, color, TextAnchor.MiddleRight, true);
+    }
+
+    void DrawBanner(float y)
+    {
+        float width = 198f;
+        Rect back = new Rect((Screen.width - width) * 0.5f, y, width, BannerHeight);
+
+        float left = bannerUntil - Time.time;
+        float fade = Mathf.Clamp01(left / 0.5f);
+        bool flash = bannerTime - left < 0.3f;
+
+        Color fill = HudStyle.BG;
+        fill.a *= fade;
+        Color line = flash ? bannerColor : HudStyle.LINE;
+        line.a *= fade;
+        Color text = bannerColor;
+        text.a *= fade;
+
+        HudStyle.Frame(back, fill, line);
+        HudStyle.Fill(new Rect(back.x + 1f, back.y + 1f, 2f, back.height - 2f), text);
+        HudStyle.Text(back, banner, 11, text, TextAnchor.MiddleCenter, true);
     }
 
     void OnGUI()
     {
         if (!active || Time.timeScale == 0f) return;
 
-        if (bannerStyle == null)
-        {
-            bannerStyle = new GUIStyle(GUI.skin.label);
-            bannerStyle.alignment = TextAnchor.MiddleCenter;
-            bannerStyle.fontSize = 48;
-            bannerStyle.fontStyle = FontStyle.Bold;
-
-            infoStyle = new GUIStyle(GUI.skin.label);
-            infoStyle.alignment = TextAnchor.MiddleCenter;
-            infoStyle.fontSize = 22;
-            infoStyle.fontStyle = FontStyle.Bold;
-
-            bossNameStyle = new GUIStyle(GUI.skin.label);
-            bossNameStyle.alignment = TextAnchor.MiddleCenter;
-            bossNameStyle.fontSize = 14;
-            bossNameStyle.fontStyle = FontStyle.Bold;
-        }
-
+        float y = HudStyle.Grid;
         if (FinalBossActive)
         {
-            DrawFinalBossBar();
+            DrawFinalBossBar(y);
+            y += BossBarHeight;
         }
         else if (phase != totalPhases)
         {
-            string info = IsBossPhase() ? "PHASE " + phase + "  BOSS" : "PHASE " + phase + "  " + Mathf.CeilToInt(Mathf.Max(0f, timer)) + "s";
-            GUI.color = Color.white;
-            GUI.Label(new Rect((Screen.width - 300f) * 0.5f, 10f, 300f, 32f), info, infoStyle);
+            DrawStageTag(y);
+            y += TagHeight;
         }
 
-        if (Time.time < bannerUntil)
-        {
-            GUI.color = Color.red;
-            GUI.Label(new Rect(0f, Screen.height * 0.25f, Screen.width, 70f), banner, bannerStyle);
-            GUI.color = Color.white;
-        }
+        if (BannerVisible) DrawBanner(y + HudStyle.Grid);
     }
 }

@@ -14,13 +14,12 @@ public class Crosshair : MonoBehaviour
     [Header("Gun Heat Gauge")]
     public float gaugeOffset = 22f;
     public float gaugeWidth = 6f;
-    public float gaugeHeight = 40f;
+    public float gaugeHeight = 44f;
     public float hitSoundVolume = 0.5f;
 
     private float markerTimer;
     private bool markerKill;
     private PlayerShooter shooter;
-    private GUIStyle labelStyle;
 
     public bool MarkerVisible => markerTimer > 0f;
     public bool MarkerKill => markerKill;
@@ -70,8 +69,8 @@ public class Crosshair : MonoBehaviour
         if (markerTimer > 0f)
         {
             float size = markerKill ? 1.4f : 1f;
-            GUI.color = markerKill ? Color.yellow : Color.white;
-            for (int i = 0; i < 4; i++) DrawLine(center, 45f + i * 90f, markerGap * size, markerLength * size, thickness * size);
+            GUI.color = markerKill ? HudStyle.ACCENT : HudStyle.TEXT;
+            for (int i = 0; i < 4; i++) DrawLine(center, 45f + i * 90f, markerGap * size, markerLength * size, thickness);
             GUI.color = Color.white;
         }
 
@@ -83,29 +82,20 @@ public class Crosshair : MonoBehaviour
         if (shooter == null) return;
 
         Rect back = new Rect(center.x + gaugeOffset, center.y - gaugeHeight * 0.5f, gaugeWidth, gaugeHeight);
-        GUI.color = new Color(0f, 0f, 0f, 0.6f);
-        GUI.DrawTexture(back, Texture2D.whiteTexture);
+        HudStyle.Frame(back, HudStyle.BG, HudStyle.LINE);
 
         float ratio = shooter.GunHeatRatio;
         bool overheated = shooter.Overheated;
         bool blinkOn = Mathf.Repeat(Time.unscaledTime * 8f, 1f) < 0.5f;
 
-        if (overheated) GUI.color = blinkOn ? Color.red : new Color(1f, 0.6f, 0.6f);
-        else GUI.color = Color.Lerp(Color.cyan, new Color(1f, 0.5f, 0f), ratio);
+        Color fill = Color.Lerp(HudStyle.TEXT, HudStyle.ACCENT, ratio);
+        if (overheated) fill = blinkOn ? HudStyle.DANGER : Color.Lerp(HudStyle.DANGER, HudStyle.LINE, 0.6f);
 
-        float fill = (gaugeHeight - 2f) * (overheated ? 1f : ratio);
-        GUI.DrawTexture(new Rect(back.x + 1f, back.yMax - 1f - fill, gaugeWidth - 2f, fill), Texture2D.whiteTexture);
+        HudStyle.BarUp(new Rect(back.x + 1f, back.y + 1f, back.width - 2f, back.height - 2f), overheated ? 1f : ratio, fill);
 
         if (overheated && blinkOn)
         {
-            if (labelStyle == null)
-            {
-                labelStyle = new GUIStyle(GUI.skin.label);
-                labelStyle.fontSize = 11;
-                labelStyle.fontStyle = FontStyle.Bold;
-            }
-            GUI.color = Color.red;
-            GUI.Label(new Rect(back.xMax + 4f, center.y - 10f, 80f, 20f), "OVERHEAT", labelStyle);
+            HudStyle.Text(new Rect(back.xMax + 6f, center.y - 7f, 80f, 13f), "OVERHEAT", 11, HudStyle.DANGER, TextAnchor.MiddleLeft, false);
         }
         GUI.color = Color.white;
     }

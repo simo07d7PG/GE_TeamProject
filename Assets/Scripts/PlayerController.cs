@@ -79,15 +79,15 @@ public class PlayerController : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
 
-        float width = 220f;
-        Rect back = new Rect((Screen.width - width) * 0.5f, Screen.height - 36f, width, 8f);
+        float width = 165f;
+        Rect back = new Rect((Screen.width - width) * 0.5f, Screen.height - 55f, width, 33f);
         float ready = Mathf.Clamp01(1f - (nextDashTime - Time.time) / dashCooldown);
 
-        GUI.color = new Color(0f, 0f, 0f, 0.6f);
-        GUI.DrawTexture(back, Texture2D.whiteTexture);
-        GUI.color = ready >= 1f ? Color.green : Color.gray;
-        GUI.DrawTexture(new Rect(back.x + 1f, back.y + 1f, (width - 2f) * ready, back.height - 2f), Texture2D.whiteTexture);
-        GUI.color = Color.white;
+        HudStyle.Frame(back, HudStyle.BG, HudStyle.LINE);
+        float pad = HudStyle.Grid;
+        HudStyle.Text(new Rect(back.x + pad, back.y + 6f, 66f, 13f), "DASH", 11, HudStyle.DIM, TextAnchor.MiddleLeft, false);
+        HudStyle.Text(new Rect(back.xMax - pad - 66f, back.y + 6f, 66f, 13f), "[C]", 11, HudStyle.DIM, TextAnchor.MiddleRight, false);
+        HudStyle.Bar(new Rect(back.x + pad, back.y + 21f, width - pad * 2f, 6f), ready, ready >= 1f ? HudStyle.TEXT : HudStyle.DIM);
     }
 
     public void OnAim(InputValue value)

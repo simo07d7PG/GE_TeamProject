@@ -10,18 +10,15 @@ public class ComboSystem : MonoBehaviour
     public float scoreBonus;
 
     [Header("Kill Effect")]
-    public float popTime = 0.25f;
-    public float stepPopTime = 0.4f;
-    public float popScale = 0.3f;
-    public float stepPopScale = 0.7f;
-    public int rayCount = 10;
+    public float flashTime = 0.15f;
+    public float popTime = 0.18f;
+    public float popScale = 0.15f;
+    public float sweepTime = 0.2f;
 
     private int combo;
     private float timer;
-    private GUIStyle style;
     private float kickTime = -999f;
     private bool steppedUp;
-    private float rayOffset;
 
     public static int Multiplier
     {
@@ -73,7 +70,6 @@ public class ComboSystem : MonoBehaviour
 
         kickTime = Time.time;
         steppedUp = Multiplier > before;
-        rayOffset = Random.value * 30f;
     }
 
     public void ResetCombo()
@@ -86,73 +82,32 @@ public class ComboSystem : MonoBehaviour
     {
         if (combo < 2 || Time.timeScale == 0f) return;
 
-        if (style == null)
-        {
-            style = new GUIStyle(GUI.skin.label);
-            style.alignment = TextAnchor.MiddleCenter;
-            style.fontSize = 28;
-            style.fontStyle = FontStyle.Bold;
-        }
+        float width = 198f;
+        float y = WaveManager.StackBottom + HudStyle.Grid + EnemyBoss.BarCount * EnemyBoss.BarStride;
+        Rect back = new Rect((Screen.width - width) * 0.5f, y, width, 33f);
 
-        float width = 260f;
-        Rect area = new Rect((Screen.width - width) * 0.5f, 70f, width, 40f);
+        float since = Time.time - kickTime;
+        float flash = 1f - Mathf.Clamp01(since / flashTime);
+        float pop = 1f + popScale * Mathf.Sin(Mathf.Clamp01(since / popTime) * Mathf.PI);
 
-        float duration = steppedUp ? stepPopTime : popTime;
-        float p = Mathf.Clamp01((Time.time - kickTime) / duration);
-        float fade = 1f - p;
-        float pop = 1f + (steppedUp ? stepPopScale : popScale) * fade * fade;
+        HudStyle.Frame(back, HudStyle.BG, Color.Lerp(HudStyle.LINE, Color.white, flash));
 
-        Color baseColor = Color.Lerp(Color.white, Color.yellow, (Multiplier - 1) / (float)Mathf.Max(1, maxMultiplier - 1));
-        Color flash = Multiplier < 3 ? new Color(1f, 0.9f, 0.2f) : Color.white;
-        Vector2 center = area.center;
+        float pad = HudStyle.Grid;
+        HudStyle.Text(new Rect(back.x + pad, back.y, 99f, back.height), "COMBO " + combo, 11, Color.Lerp(HudStyle.TEXT, Color.white, flash), TextAnchor.MiddleLeft, false);
 
-        if (p < 1f) DrawEffect(center, p, steppedUp);
-
+        Rect number = new Rect(back.xMax - pad - 77f, back.y, 77f, back.height);
         Matrix4x4 saved = GUI.matrix;
-        GUIUtility.ScaleAroundPivot(new Vector2(pop, pop), center);
-        GUI.color = Color.Lerp(baseColor, flash, fade);
-        GUI.Label(area, "COMBO " + combo + "  x" + TotalMultiplier.ToString("0.##"), style);
+        GUIUtility.ScaleAroundPivot(new Vector2(pop, pop), new Vector2(number.xMax - 22f, number.center.y));
+        HudStyle.Text(number, "x" + TotalMultiplier.ToString("0.##"), 22, Color.Lerp(HudStyle.ACCENT, Color.white, flash), TextAnchor.MiddleRight, true);
         GUI.matrix = saved;
 
-        GUI.color = new Color(0f, 0f, 0f, 0.6f);
-        GUI.DrawTexture(new Rect(area.x, area.yMax, width, 6f), Texture2D.whiteTexture);
-        GUI.color = Color.yellow;
-        GUI.DrawTexture(new Rect(area.x, area.yMax, width * Mathf.Clamp01(timer / comboWindow), 6f), Texture2D.whiteTexture);
-        GUI.color = Color.white;
-    }
+        HudStyle.Bar(new Rect(back.x, back.yMax + 1f, width, 2f), timer / comboWindow, HudStyle.ACCENT);
 
-    void DrawEffect(Vector2 center, float p, bool big)
-    {
-        float alpha = 1f - p;
-        float spread = 1f - (1f - p) * (1f - p);
-        int count = big ? rayCount * 2 : rayCount;
-
-        GUI.color = new Color(1f, 0.9f, 0.3f, alpha);
-        for (int i = 0; i < count; i++)
+        if (steppedUp && since < sweepTime * 1.75f)
         {
-            float angle = rayOffset + 360f / count * i;
-            float rad = angle * Mathf.Deg2Rad;
-            float length = 8f + 14f * alpha;
-            Vector2 start = center + new Vector2(Mathf.Cos(rad) * (95f + 70f * spread), Mathf.Sin(rad) * (16f + 40f * spread));
-            DrawRay(start, angle, length, 3f);
+            Color sweep = HudStyle.ACCENT;
+            sweep.a = 1f - Mathf.Clamp01((since - sweepTime) / (sweepTime * 0.75f));
+            HudStyle.Fill(new Rect(back.x, back.yMax + 5f, width * Mathf.Clamp01(since / sweepTime), 2f), sweep);
         }
-
-        if (!big) return;
-
-        GUI.color = new Color(1f, 1f, 1f, alpha);
-        for (int i = 0; i < 24; i++)
-        {
-            float rad = (360f / 24f * i) * Mathf.Deg2Rad;
-            Vector2 pos = center + new Vector2(Mathf.Cos(rad) * (120f + 110f * spread), Mathf.Sin(rad) * (24f + 60f * spread));
-            GUI.DrawTexture(new Rect(pos.x - 2f, pos.y - 2f, 4f, 4f), Texture2D.whiteTexture);
-        }
-    }
-
-    void DrawRay(Vector2 start, float angle, float length, float width)
-    {
-        Matrix4x4 saved = GUI.matrix;
-        GUIUtility.RotateAroundPivot(angle, start);
-        GUI.DrawTexture(new Rect(start.x, start.y - width * 0.5f, length, width), Texture2D.whiteTexture);
-        GUI.matrix = saved;
     }
 }

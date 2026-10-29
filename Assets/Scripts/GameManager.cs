@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     public Text clearScoreText;
     public HeatGauge heatGauge;
     public EnemySpawner[] spawners;
+    public Font hudFont;
+    public Font hudFontBold;
 
     private GameObject player;
     private PlayerShooter playerShooter;
@@ -80,7 +82,7 @@ public class GameManager : MonoBehaviour
         if (!isPlaying) return;
         isPlaying = false;
         if (WaveManager.Instance != null) WaveManager.Instance.End();
-        resultScoreText.text = "SCORE " + score;
+        resultScoreText.text = "SCORE " + score.ToString("D6");
         resultPanel.SetActive(true);
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
@@ -91,7 +93,7 @@ public class GameManager : MonoBehaviour
         if (!isPlaying) return;
         isPlaying = false;
         if (WaveManager.Instance != null) WaveManager.Instance.End();
-        if (clearScoreText != null) clearScoreText.text = "SCORE " + score;
+        if (clearScoreText != null) clearScoreText.text = "SCORE " + score.ToString("D6");
         if (clearPanel != null) clearPanel.SetActive(true);
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
@@ -135,6 +137,6 @@ public class GameManager : MonoBehaviour
 
     void UpdateScoreText()
     {
-        scoreText.text = "SCORE " + score;
+        scoreText.text = score.ToString("D6");
     }
 }

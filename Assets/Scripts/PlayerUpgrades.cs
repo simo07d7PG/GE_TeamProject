@@ -11,7 +11,6 @@ public class PlayerUpgrades : MonoBehaviour
     private float tripleUntil;
     private float rapidUntil;
     private float pierceUntil;
-    private GUIStyle style;
 
     public static bool TripleShot { get { return Instance != null && Time.time < Instance.tripleUntil; } }
     public static bool RapidFire { get { return Instance != null && Time.time < Instance.rapidUntil; } }
@@ -64,18 +63,10 @@ public class PlayerUpgrades : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
 
-        if (style == null)
-        {
-            style = new GUIStyle(GUI.skin.label);
-            style.fontSize = 18;
-            style.fontStyle = FontStyle.Bold;
-        }
-
         float y = Screen.height - 140f;
         y = DrawLine(y, "3WAY", tripleUntil, Pickup.ColorOf(PickupType.TripleShot));
         y = DrawLine(y, "RAPID", rapidUntil, Pickup.ColorOf(PickupType.RapidFire));
         DrawLine(y, "PIERCE", pierceUntil, Pickup.ColorOf(PickupType.Pierce));
-        GUI.color = Color.white;
     }
 
     float DrawLine(float y, string label, float until, Color color)
@@ -83,8 +74,11 @@ public class PlayerUpgrades : MonoBehaviour
         float left = until - Time.time;
         if (left <= 0f) return y;
 
-        GUI.color = color;
-        GUI.Label(new Rect(20f, y, 200f, 24f), label + " " + left.ToString("0.0") + "s", style);
-        return y - 26f;
+        Rect back = new Rect(22f, y, 154f, 22f);
+        HudStyle.Frame(back, HudStyle.BG, HudStyle.LINE);
+        HudStyle.Fill(new Rect(back.x + 11f, back.y + 8f, 6f, 6f), color);
+        HudStyle.Text(new Rect(back.x + 28f, back.y, 77f, back.height), label, 11, HudStyle.TEXT, TextAnchor.MiddleLeft, false);
+        HudStyle.Text(new Rect(back.xMax - 11f - 44f, back.y, 44f, back.height), left.ToString("0.0") + "s", 11, HudStyle.TEXT, TextAnchor.MiddleRight, false);
+        return y - 28f;
     }
 }

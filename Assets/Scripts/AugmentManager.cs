@@ -25,6 +25,9 @@ public class AugmentManager : MonoBehaviour
     public Text[] nameTexts;
     public Text[] tierTexts;
     public Text[] descTexts;
+    public Text[] valueTexts;
+    public Text[] codeTexts;
+    public Text[] fixedTexts;
 
     private static readonly string[] Names =
     {
@@ -35,10 +38,21 @@ public class AugmentManager : MonoBehaviour
         "벤치마크 MAXX",
     };
 
+    private static readonly string[] Codes =
+    {
+        "[FAN]",
+        "[AV]",
+        "[REV]",
+        "[OPT]",
+        "[BENCH]",
+    };
+
     private readonly int[] tiers = new int[5];
     private readonly List<int> fixedTypes = new List<int>();
     private readonly int[] offer = new int[3];
     private PlayerShooter shooter;
+    private string rowLabels;
+    private string rowValues;
 
     void Awake()
     {
@@ -92,7 +106,7 @@ public class AugmentManager : MonoBehaviour
 
         if (!pickable || panel == null) return false;
 
-        if (headerText != null) headerText.text = "PHASE " + phaseCleared + " CLEAR";
+        if (headerText != null) headerText.text = "STAGE " + phaseCleared + " CLEAR";
         for (int s = 0; s < offer.Length; s++) FillCard(s);
         UpdateOwned();
         panel.SetActive(true);
@@ -112,36 +126,90 @@ public class AugmentManager : MonoBehaviour
 
         int tier = tiers[type];
         bool max = tier >= maxTier;
-        if (nameTexts[slot] != null) nameTexts[slot].text = Names[type];
-        if (tierTexts[slot] != null) tierTexts[slot].text = max ? "MAX" : "Tier " + tier + " → " + (tier + 1);
-        if (descTexts[slot] != null) descTexts[slot].text = Describe((AugmentType)type, tier, max);
+        Color main = max ? HudStyle.DIM : HudStyle.TEXT;
+        if (codeTexts != null && slot < codeTexts.Length && codeTexts[slot] != null) codeTexts[slot].text = Codes[type];
+        if (fixedTexts != null && slot < fixedTexts.Length && fixedTexts[slot] != null) fixedTexts[slot].text = fixedTypes.Contains(type) ? "[고정]" : "";
+        if (nameTexts[slot] != null)
+        {
+            nameTexts[slot].text = Names[type];
+            nameTexts[slot].color = main;
+        }
+        if (tierTexts[slot] != null) tierTexts[slot].text = Pips(tier, max);
+        Describe((AugmentType)type, tier, max);
+        if (descTexts[slot] != null) descTexts[slot].text = rowLabels;
+        if (valueTexts != null && slot < valueTexts.Length && valueTexts[slot] != null)
+        {
+            valueTexts[slot].text = rowValues;
+            valueTexts[slot].color = main;
+        }
+    }
+
+    string Tag(Color color, string text)
+    {
+        return "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + text + "</color>";
+    }
+
+    string Pips(int tier, bool max)
+    {
+        string pips = "";
+        for (int i = 0; i < maxTier; i++)
+        {
+            if (max) pips += Tag(HudStyle.DIM, "■");
+            else pips += i < tier ? Tag(HudStyle.ACCENT, "■") : Tag(HudStyle.DIM, "□");
+        }
+        string info = max ? "MAX" : "T" + tier + " → T" + (tier + 1);
+        return pips + "  <size=11>" + Tag(HudStyle.DIM, info) + "</size>";
     }
 
     string Pc(string sign, float cur, float next, bool arrow)
     {
-        string a = sign + Mathf.RoundToInt(cur * 100f) + "%";
+        string a = cur <= 0f ? "0%" : sign + Mathf.RoundToInt(cur * 100f) + "%";
         if (!arrow) return a;
-        return a + " → " + sign + Mathf.RoundToInt(next * 100f) + "%";
+        return Tag(HudStyle.DIM, a + " → ") + sign + Mathf.RoundToInt(next * 100f) + "%";
     }
 
-    string Describe(AugmentType type, int tier, bool max)
+    void Row(string label, string value)
+    {
+        if (rowLabels.Length > 0)
+        {
+            rowLabels += "\n";
+            rowValues += "\n";
+        }
+        rowLabels += label;
+        rowValues += value;
+    }
+
+    void Describe(AugmentType type, int tier, bool max)
     {
         float cur = BonusAt(tier);
         float next = BonusAt(tier + 1);
         bool arrow = !max;
+        rowLabels = "";
+        rowValues = "";
         switch (type)
         {
             case AugmentType.Cooling:
-                return "열 상승 " + Pc("-", cur, next, arrow) + "\n냉각 " + Pc("+", cur, next, arrow)
-                    + "\n총기 발열 " + Pc("-", cur, next, arrow) + "\n총기 냉각 " + Pc("+", cur, next, arrow);
+                Row("열 상승", Pc("-", cur, next, arrow));
+                Row("냉각", Pc("+", cur, next, arrow));
+                Row("총기 발열", Pc("-", cur, next, arrow));
+                Row("총기 냉각", Pc("+", cur, next, arrow));
+                break;
             case AugmentType.Vaccine:
-                return "공격력 " + Pc("+", cur, next, arrow) + "\n광고 팝업 차단 " + Pc("", cur, next, arrow);
+                Row("공격력", Pc("+", cur, next, arrow));
+                Row("광고 팝업 차단", Pc("", cur, next, arrow));
+                break;
             case AugmentType.ReverseEngineering:
-                return "아이템 드롭률 " + Pc("+", cur, next, arrow);
+                Row("아이템 드롭률", Pc("+", cur, next, arrow));
+                break;
             case AugmentType.Optimization:
-                return (tier == 0 ? "연사 기능 추가\n" : "") + "연사 속도 " + Pc("+", cur, next, arrow) + "\n탄속 " + Pc("+", cur, next, arrow);
+                if (tier == 0) Row("연사 기능", "추가");
+                Row("연사 속도", Pc("+", cur, next, arrow));
+                Row("탄속", Pc("+", cur, next, arrow));
+                break;
             default:
-                return "모든 열 상승 " + Pc("+", cur, next, arrow) + "\n콤보 점수 배율 " + Pc("+", cur, next, arrow);
+                Row("모든 열 상승", Pc("+", cur, next, arrow));
+                Row("콤보 점수 배율", Pc("+", cur, next, arrow));
+                break;
         }
     }
 
@@ -149,9 +217,14 @@ public class AugmentManager : MonoBehaviour
     {
         if (ownedText == null) return;
 
-        string list = "보유 증강";
-        if (fixedTypes.Count == 0) list += "\n없음";
-        foreach (int t in fixedTypes) list += "\n" + Names[t] + "  Tier " + tiers[t];
+        string list = Tag(HudStyle.DIM, "설치됨") + "  ";
+        if (fixedTypes.Count == 0) list += Tag(HudStyle.DIM, "없음");
+        for (int i = 0; i < fixedTypes.Count; i++)
+        {
+            int t = fixedTypes[i];
+            if (i > 0) list += Tag(HudStyle.DIM, " · ");
+            list += Tag(HudStyle.TEXT, Names[t]) + " " + Tag(HudStyle.DIM, "T" + tiers[t]);
+        }
         ownedText.text = list;
     }
 

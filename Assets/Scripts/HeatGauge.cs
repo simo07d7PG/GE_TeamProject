@@ -6,8 +6,11 @@ public class HeatGauge : MonoBehaviour
     public Slider heatSlider;
     public Image heatFill;
     public Text heatText;
-    public Color hotColor = new Color(0.9f, 0.1f, 0.1f);
-    public Color coolingColor = new Color(0.78f, 0.78f, 0.78f);
+    public Text coolingText;
+    public Color hotColor = new Color32(0xFF, 0x4B, 0x3E, 255);
+    public Color coolingColor = new Color32(0xB9, 0xC0, 0xC7, 255);
+    public float minTemp = 30f;
+    public float maxTemp = 100f;
     public GameManager gameManager;
 
     [Header("Heat")]
@@ -88,7 +91,8 @@ public class HeatGauge : MonoBehaviour
         float ratio = HeatRatio;
         if (heatSlider != null) heatSlider.value = ratio;
         if (heatFill != null) heatFill.color = isCooling ? coolingColor : hotColor;
-        if (heatText != null) heatText.text = Mathf.RoundToInt(ratio * 100f) + "%";
+        if (heatText != null) heatText.text = Mathf.RoundToInt(Mathf.Lerp(minTemp, maxTemp, ratio)) + "°C";
+        if (coolingText != null) coolingText.text = isCooling ? "COOLING" : "";
         if (fanLow != null && fanHigh != null)
         {
             float volume = Mathf.Lerp(fanMinVolume, fanMaxVolume, ratio);

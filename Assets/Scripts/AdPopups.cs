@@ -26,7 +26,6 @@ public class AdPopups : MonoBehaviour
     };
 
     private readonly List<Popup> popups = new List<Popup>();
-    private GUIStyle bodyStyle;
 
     public static void Create()
     {
@@ -83,15 +82,6 @@ public class AdPopups : MonoBehaviour
     {
         if (Time.timeScale == 0f || popups.Count == 0) return;
 
-        if (bodyStyle == null)
-        {
-            bodyStyle = new GUIStyle(GUI.skin.label);
-            bodyStyle.alignment = TextAnchor.MiddleCenter;
-            bodyStyle.fontSize = 20;
-            bodyStyle.fontStyle = FontStyle.Bold;
-            bodyStyle.normal.textColor = Color.black;
-        }
-
         foreach (Popup p in popups)
         {
             GUI.color = new Color(0.9f, 0.9f, 0.9f, 0.95f);
@@ -101,15 +91,12 @@ public class AdPopups : MonoBehaviour
             GUI.color = new Color(0.1f, 0.2f, 0.8f, 1f);
             GUI.DrawTexture(title, Texture2D.whiteTexture);
 
-            GUI.color = Color.white;
-            GUI.Label(new Rect(title.x + 6f, title.y, 120f, 22f), "AD");
+            HudStyle.Text(new Rect(title.x + 6f, title.y, 120f, 22f), "AD", 11, Color.white, TextAnchor.MiddleLeft, true);
             GUI.color = Color.red;
             GUI.DrawTexture(new Rect(title.xMax - 22f, title.y + 2f, 18f, 18f), Texture2D.whiteTexture);
-            GUI.color = Color.white;
-            GUI.Label(new Rect(title.xMax - 20f, title.y, 18f, 22f), "X");
+            HudStyle.Text(new Rect(title.xMax - 22f, title.y, 18f, 22f), "X", 11, Color.white, TextAnchor.MiddleCenter, true);
 
-            GUI.color = Color.white;
-            GUI.Label(new Rect(p.rect.x, p.rect.y + 22f, p.rect.width, p.rect.height - 22f), p.text, bodyStyle);
+            HudStyle.Text(new Rect(p.rect.x, p.rect.y + 22f, p.rect.width, p.rect.height - 22f), p.text, 22, Color.black, TextAnchor.MiddleCenter, true);
         }
         GUI.color = Color.white;
     }

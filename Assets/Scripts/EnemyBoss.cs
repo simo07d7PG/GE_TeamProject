@@ -10,6 +10,9 @@ public class EnemyBoss : MonoBehaviour
     public int ringBullets = 10;
     public float bulletSpeed = 8f;
 
+    public const float BarHeight = 33f;
+    public const float BarStride = 44f;
+
     private static readonly List<EnemyBoss> bosses = new List<EnemyBoss>();
 
     private Transform player;
@@ -18,6 +21,20 @@ public class EnemyBoss : MonoBehaviour
     private EnemyMove mover;
     private float lastFireTime;
     private float ringOffset;
+
+    public static int BarCount
+    {
+        get
+        {
+            Health finalBoss = WaveManager.Instance != null ? WaveManager.Instance.FinalBoss : null;
+            int count = 0;
+            foreach (EnemyBoss b in bosses)
+            {
+                if (b.health != null && b.health != finalBoss) count++;
+            }
+            return count;
+        }
+    }
 
     void OnEnable()
     {
@@ -80,16 +97,18 @@ public class EnemyBoss : MonoBehaviour
         if (Time.timeScale == 0f || health == null) return;
         if (WaveManager.Instance != null && WaveManager.Instance.FinalBoss == health) return;
 
-        float width = 360f;
-        float height = 16f;
+        float width = 330f;
         int index = bosses.IndexOf(this);
-        Rect back = new Rect((Screen.width - width) * 0.5f, 48f + index * 26f, width, height);
+        float top = WaveManager.StackBottom + HudStyle.Grid;
+        Rect back = new Rect((Screen.width - width) * 0.5f, top + index * BarStride, width, BarHeight);
+        HudStyle.Frame(back, HudStyle.BG, HudStyle.LINE);
 
-        GUI.color = new Color(0f, 0f, 0f, 0.7f);
-        GUI.DrawTexture(back, Texture2D.whiteTexture);
-        GUI.color = new Color(0.8f, 0.1f, 0.9f);
+        float pad = HudStyle.Grid;
+        HudStyle.Text(new Rect(back.x + pad, back.y + 6f, width * 0.5f, 13f), "BOSS", 11, HudStyle.DIM, TextAnchor.MiddleLeft, false);
+        string hp = "HP " + Mathf.Max(0, health.currentHp) + "/" + health.maxHp;
+        HudStyle.Text(new Rect(back.xMax - pad - width * 0.5f, back.y + 6f, width * 0.5f, 13f), hp, 11, HudStyle.TEXT, TextAnchor.MiddleRight, false);
+
         float ratio = Mathf.Clamp01((float)health.currentHp / health.maxHp);
-        GUI.DrawTexture(new Rect(back.x + 2f, back.y + 2f, (width - 4f) * ratio, height - 4f), Texture2D.whiteTexture);
-        GUI.color = Color.white;
+        HudStyle.Bar(new Rect(back.x + pad, back.y + 21f, width - pad * 2f, 6f), ratio, HudStyle.DANGER);
     }
 }
